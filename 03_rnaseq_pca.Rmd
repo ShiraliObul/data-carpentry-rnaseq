@@ -58,6 +58,11 @@ that each axis explains.
 * Eigen vectors - these reflect the "weight" that each variable has on a particular 
 PC. These can be thought of as the correlation between the PC and the original variable.
 
+See this article for a nice introduction to this topic, which also uses transcriptome 
+data: 
+Jake Lever, Martin Krzywinski & Naomi Altman (2017) [Principal component analysis](https://www.nature.com/articles/nmeth.4346),
+Nature Methods 14, 641–642
+
 
 # Running PCA using `prcomp()`
 
