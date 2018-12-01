@@ -1,0 +1,145 @@
+---
+title: "Exploratory analysis of RNAseq data"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    toc_depth: 3
+    highlight: pygments
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
+```
+
+# Lesson objectives
+
+* Introducing a `matrix` object and how to convert it to a `tibble`
+* Reformat data from wide to long format (and vice-versa)
+* Join tables
+
+
+# Summary of dataset
+
+In this lesson, we will apply some of the skills that we've gained so far to manipulate 
+and explore a dataset from an RNAseq experiment. 
+
+This lesson uses data from an experiment included in the 
+[`fission` R/Bioconductor package](https://bioconductor.org/packages/release/data/experiment/vignettes/fission/inst/doc/fission.html). 
+Very briefly, we have transcriptome data for:
+
+* Two yeast strains: wild type ("wt") and _atf21del_ mutant ("mut")
+* Each has 6 time points of osmotic stress time (0, 15, 30, 60, 120 and 180 mins)
+* Three replicates for each strain at each time point
+
+Let's say that you did this experiment yourself, and that a bioinformatician 
+analysed it and provided you with four things:
+
+* Information about each sample
+* Read counts for all genes (a measure of the genes' expression) simply normalised to 
+the size of each library (to account for the fact that different samples have more 
+or less total number of reads)
+* Normalised read counts for all genes but on a log scale and transformed to correct 
+for a dependency between the mean and variance, which is typical in such count data
+* Results from a statistical test that assesses the likelihood of your data 
+assuming no difference between the first and last time points of WT cells
+
+
+# Getting started
+
+The data are provided within an `RData` file, which you can download and read 
+into your R session.
+
+First, let's clean our workspace (remove any objects created before), 
+and also load the `tidyverse` package. 
+
+It's also a good idea to check if your _working directory_ is correctly set to 
+your workshop folder, which should contain a `data` folder within it (you can 
+use `getwd()` to check your _working directory_).
+
+```{r, eval = FALSE}
+# Clean your workspace by removing any objects created beforehand
+rm(list = ls())
+
+# Load the tidyverse package
+library(tidyverse)
+
+# Download the data provided by your collaborator
+dir.create("data")
+download.file("https://github.com/tavareshugo/data_carpentry_extras/blob/master/rnaseq_visualisation/fission_data.RData?raw=true",
+              destfile = "data/fission_data.RData",
+              method = "wb")
+
+# Load the data
+load("data/fission_data.RData")
+```
+
+```{r, echo = FALSE, message = FALSE}
+# In the repository data is read from the current directory
+# Load the tidyverse package
+library(tidyverse)
+
+# Load the data
+load("data/fission_data.RData")
+```
+
+----
+
+**Exercise:**
+
+> Familiarise yourself with these data:
+>
+> - what kind of objects were you provided with? (hint: `class()`)
+> - How many samples did you have? Is the design balanced?
+> - How many genes do you have gene expression levels for?
+
+----
+
+
+
+### Matrix object
+
+You might have noticed that `trans_cts` is a `matrix` object. We haven't found 
+these before, and to produce visualisations of our data, it is convenient to 
+start by converting our matrix of gene expression to a `tibble` (`data.frame`).
+
+Matrices are a bit similar to `data.frame`, but they only contain values of a 
+single type, in this case numeric values (whereas in a `data.frame` different 
+columns can contain different types of data). 
+
+```{r}
+# Look at the first 10 rows and first 5 samples of trans_cts
+trans_cts[1:10, 1:5]
+```
+
+You will also notice that gene names are contained in the row names of this 
+matrix (they are not a column of their own!). 
+
+To convert this matrix into a `tibble` object we can use the function `as_tibble()`:
+
+```{r}
+# Convert matrix to tibble
+as_tibble(trans_cts)
+```
+
+But now we've lost our gene names! 
+If we look at the function's help (`?as_tibble`), we can see that there's a way 
+to solve this problem:
+
+```{r}
+# Convert matrix to tibble - add colnames to a new column called "gene"
+trans_cts_tbl <- as_tibble(trans_cts, rownames = "gene")
+trans_cts_tbl
+```
+
+----
+
+**Exercise:**
+
+* Convert the `norm_cts` matrix to a tibble and save it into a new object called `norm_cts_tbl`
+
+----
+
+
+
