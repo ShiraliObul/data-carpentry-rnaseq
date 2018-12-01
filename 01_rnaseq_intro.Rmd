@@ -68,9 +68,9 @@ library(tidyverse)
 
 # Download the data provided by your collaborator
 dir.create("data")
-download.file("https://github.com/tavareshugo/data_carpentry_extras/blob/master/rnaseq_visualisation/fission_data.RData?raw=true",
+download.file("https://github.com/tavareshugo/data-carpentry-rnaseq/blob/master/data/fission_data.RData?raw=true",
               destfile = "data/fission_data.RData",
-              method = "wb")
+              mode = "wb")
 
 # Load the data
 load("data/fission_data.RData")
