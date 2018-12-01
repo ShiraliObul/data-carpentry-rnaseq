@@ -30,6 +30,6 @@ If you are doing RNAseq analysis, you should use
 [dedicated packages and workflows](https://www.bioconductor.org/help/workflows/rnaseqGene/), 
 which implement models to account for particular features of these data.
 
-If you are interested, you can see [how the data for this lesson was pre-processed]() 
+If you are interested, you can see [how the data for this lesson was pre-processed](https://github.com/tavareshugo/data-carpentry-rnaseq/blob/master/prepare_fission_data.R) 
 using the `DESeq2` package.
 

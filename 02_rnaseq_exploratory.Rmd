@@ -13,13 +13,17 @@ output:
 knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
 ```
 
+[back to lesson's homepage](https://tavareshugo.github.io/data-carpentry-rnaseq/)
+
+
 # Lesson Objectives
 
-Apply adequate visualisation methods to explore:
-
-* Variation of data within samples (sample distributions) 
-* Covariation between samples (sample correlations)
-* Understand properties of count data such as the relationship between mean and variance
+* Apply adequate visualisation methods to explore:
+    * Variation of data within samples (sample distributions) 
+    * Covariation between samples (sample correlations)
+    * Understand properties of count data such as the relationship between mean and variance
+* Reformat data from wide to long format (and vice-versa)
+* Join tables
 
 
 ```{r, echo = FALSE, message = FALSE}
@@ -121,7 +125,7 @@ Joining tables is an important task that is often needed in multi-layered data.
 
 There are several different kinds of joins that can be performed. Here's a couple:
 
-![joins](https://datacarpentry.org/R-ecology-lesson/img/joins.svg)
+![](https://datacarpentry.org/R-ecology-lesson/img/joins.svg)
 
 Look at the "Combine Data Sets" section of the 
 [dplyr cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf) 
@@ -298,3 +302,5 @@ the transformed data do no longer show a (strong) dependency between a gene’s 
 and its variance.
 
 
+----
+[back to lesson's homepage](https://tavareshugo.github.io/data-carpentry-rnaseq/)

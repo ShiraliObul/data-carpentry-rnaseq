@@ -13,11 +13,12 @@ output:
 knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
 ```
 
+[back to lesson's homepage](https://tavareshugo.github.io/data-carpentry-rnaseq/)
+
 # Lesson objectives
 
+* Understand the dataset being used
 * Introducing a `matrix` object and how to convert it to a `tibble`
-* Reformat data from wide to long format (and vice-versa)
-* Join tables
 
 
 # Summary of dataset
@@ -142,4 +143,6 @@ trans_cts_tbl
 ----
 
 
+----
 
+[back to lesson's homepage](https://tavareshugo.github.io/data-carpentry-rnaseq/)

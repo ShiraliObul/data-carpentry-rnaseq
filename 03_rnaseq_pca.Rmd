@@ -13,6 +13,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
 ```
 
+[back to lesson's homepage](https://tavareshugo.github.io/data-carpentry-rnaseq/)
+
 # Lesson Objectives
 
 * Gain an intuitive understanding of principal component analysis (PCA)
@@ -241,3 +243,7 @@ autoplot(sample_pca, data = sample_info, colour = "minute", shape = "strain") +
 
 This is still a bit crowded, but you can play around with these commands to 
 improve the visualisation (e.g. restrict the number of genes even more)
+
+
+----
+[back to lesson's homepage](https://tavareshugo.github.io/data-carpentry-rnaseq/)
