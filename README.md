@@ -1,6 +1,6 @@
-# Analysis of RNAseq data
+**Authors:** Hugo Tavares, Georg Zeller
 
-Authors: Hugo Tavares, Georg Zeller
+----
 
 These are extra materials used as a complement to 
 [Data Carpentry in R](http://www.datacarpentry.org/R-ecology-lesson/) 
