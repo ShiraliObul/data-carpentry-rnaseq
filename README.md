@@ -13,8 +13,7 @@ These lessons are under active development and may change over time:
 to understand some properties of expression data
 * [Using principal component analysis (PCA)](03_rnaseq_pca.html)
 to explore transcriptome-wide effects of our experimental design
-* (**lesson under development**) Explore patterns of expression
-for a subset of potentially interesting genes
+* [Using clustering](04_rnaseq_clustering.html) to explore patterns of gene expression
 
 
 ### Important note
