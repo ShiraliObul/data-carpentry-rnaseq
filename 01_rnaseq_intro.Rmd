@@ -43,8 +43,8 @@ the size of each library (to account for the fact that different samples have mo
 or less total number of reads)
 * Normalised read counts for all genes but on a log scale and transformed to correct 
 for a dependency between the mean and variance, which is typical in such count data
-* Results from a statistical test that assesses the likelihood of your data 
-assuming no difference between the first and last time points of WT cells
+* Results from a statistical test that assessed the likelihood of your data 
+assuming no difference between the first each of the other time points in WT cells
 
 
 # Getting started

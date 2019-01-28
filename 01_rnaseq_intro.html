@@ -271,7 +271,7 @@ div.tocify {
 <li>Information about each sample</li>
 <li>Read counts for all genes (a measure of the genes’ expression) simply normalised to the size of each library (to account for the fact that different samples have more or less total number of reads)</li>
 <li>Normalised read counts for all genes but on a log scale and transformed to correct for a dependency between the mean and variance, which is typical in such count data</li>
-<li>Results from a statistical test that assesses the likelihood of your data assuming no difference between the first and last time points of WT cells</li>
+<li>Results from a statistical test that assessed the likelihood of your data assuming no difference between the first each of the other time points in WT cells</li>
 </ul>
 </div>
 <div id="getting-started" class="section level1">
@@ -338,7 +338,7 @@ trans_cts[<span class="dv">1</span><span class="op">:</span><span class="dv">10<
 ##  8    7.24    7.46    7.48     7.09     7.46     7.65     6.88     7.13
 ##  9    5.96    5.69    5.94     5.92     5.87     4.84     7.38     7.30
 ## 10    6.64    6.65    6.78     4.62     5.61     6.15     5.66     6.50
-## # ... with 6,001 more rows, and 28 more variables: wt_30_r3 &lt;dbl&gt;,
+## # … with 6,001 more rows, and 28 more variables: wt_30_r3 &lt;dbl&gt;,
 ## #   wt_60_r1 &lt;dbl&gt;, wt_60_r2 &lt;dbl&gt;, wt_60_r3 &lt;dbl&gt;, wt_120_r1 &lt;dbl&gt;,
 ## #   wt_120_r2 &lt;dbl&gt;, wt_120_r3 &lt;dbl&gt;, wt_180_r1 &lt;dbl&gt;, wt_180_r2 &lt;dbl&gt;,
 ## #   wt_180_r3 &lt;dbl&gt;, mut_0_r1 &lt;dbl&gt;, mut_0_r2 &lt;dbl&gt;, mut_0_r3 &lt;dbl&gt;,
@@ -363,7 +363,7 @@ trans_cts_tbl</code></pre></div>
 ##  8 SPAC…    7.24    7.46    7.48     7.09     7.46     7.65     6.88
 ##  9 SPNC…    5.96    5.69    5.94     5.92     5.87     4.84     7.38
 ## 10 SPAC…    6.64    6.65    6.78     4.62     5.61     6.15     5.66
-## # ... with 6,001 more rows, and 29 more variables: wt_30_r2 &lt;dbl&gt;,
+## # … with 6,001 more rows, and 29 more variables: wt_30_r2 &lt;dbl&gt;,
 ## #   wt_30_r3 &lt;dbl&gt;, wt_60_r1 &lt;dbl&gt;, wt_60_r2 &lt;dbl&gt;, wt_60_r3 &lt;dbl&gt;,
 ## #   wt_120_r1 &lt;dbl&gt;, wt_120_r2 &lt;dbl&gt;, wt_120_r3 &lt;dbl&gt;, wt_180_r1 &lt;dbl&gt;,
 ## #   wt_180_r2 &lt;dbl&gt;, wt_180_r3 &lt;dbl&gt;, mut_0_r1 &lt;dbl&gt;, mut_0_r2 &lt;dbl&gt;,

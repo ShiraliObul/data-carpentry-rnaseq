@@ -100,13 +100,25 @@ autoplot(sample_pca, data = sample_info, colour = "minute", shape = "strain")
 ```
 
 From this plot, we can see that:
-* samples seem to cluster by time-point, suggesting most of the variance in 
-transcriptome is due to stress exposure. 
+* samples seem to cluster by time-point (is it related to time of exposure to 
+stress? Or perhaps cell cycle phase, which was not controlled for?)
 * T120 and T180 seem to be undistinguishable using PC1 and PC2 (but they might 
 be distinguishable if we explore other PC axis!). 
 * the genotype does not drive major changes in the transcriptome (but, again, 
 it doesn't mean that no genes differ between the genotypes, just that they don't 
 explain most of the variance captured by PC1 and PC2)
+
+Note that often it is good practice to _standardize_ the variables before doing the PCA. 
+This is often done by _centering_ the data on the mean and then _scaling_ it by 
+dividing by the standard deviation. This ensures that the PCA is not too influenced 
+by genes with higher absolute expression. By default, the `prcomp()` function 
+does the centering but not the scaling. See the `?prcomp` help to see how to change 
+this default behaviour. In this case, because we are using the 
+transformed data, this is not too much of an issue, but try re-running the PCA 
+with the _centered_ and _scaled_ data to see how it changes it. 
+
+We talk more about standardizing gene expression data in the 
+[gene clustering lesson](04_rnaseq_clustering.html).
 
 
 # Exploring PCA output
@@ -247,7 +259,13 @@ autoplot(sample_pca, data = sample_info, colour = "minute", shape = "strain") +
 ```
 
 This is still a bit crowded, but you can play around with these commands to 
-improve the visualisation (e.g. restrict the number of genes even more)
+improve the visualisation (e.g. restrict the number of genes even more).
+
+Note that although this analysis gives some indication of how much influence a 
+particular gene has along each PC, it is not a replacement for specialised 
+[statistical models](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8) 
+and [tools](https://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html) 
+that assess specific hypothesis for differential expression between conditions.
 
 
 ----
