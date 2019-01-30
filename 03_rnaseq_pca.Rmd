@@ -100,6 +100,7 @@ autoplot(sample_pca, data = sample_info, colour = "minute", shape = "strain")
 ```
 
 From this plot, we can see that:
+
 * samples seem to cluster by time-point (is it related to time of exposure to 
 stress? Or perhaps cell cycle phase, which was not controlled for?)
 * T120 and T180 seem to be undistinguishable using PC1 and PC2 (but they might 
@@ -171,7 +172,8 @@ down to just `r length(sample_pca$sdev)`!
 Let's say we want to know which genes have the highest influence along PC1 and PC2 that 
 we plotted above. Usually, this type of question is answered by using a [biplot](https://en.wikipedia.org/wiki/Biplot).
 
-You can easily produce such a plot using the `autoplot()` function:
+You can easily produce such a plot using the `autoplot()` function by adding the 
+options `loadings = TRUE, loadings.label = TRUE`:
 
 ```{r, eval=FALSE}
 # Example using iris dataset
@@ -180,7 +182,7 @@ autoplot(prcomp(iris[, -5]), data = iris, colour = "Species",
 ```
 
 However, because we have thousands of genes, this would be completely incomprehensible 
-(and probably crash your computer!).
+on our data (and probably crash your computer!).
 
 Instead, for big data like this, we will have to be more selective and focus on a few 
 genes only. 
@@ -213,7 +215,7 @@ top_genes <- tidy(sample_pca, matrix = "variables") %>%
   group_by(PC) %>%
   # sort table by descending value
   arrange(desc(abs(value))) %>%
-  # take top 10 rows of each PC group
+  # take top 5 rows of each PC group
   slice(1:5) %>%
   # extract the column (gene name) from the table
   pull(column) %>%
@@ -252,14 +254,22 @@ autoplot(sample_pca, data = sample_info, colour = "minute", shape = "strain") +
                aes(x = 0, y = 0, xend = PC1, yend = PC2), 
                arrow = arrow(length = unit(0.1, "in")),
                colour = "brown") +
-  ggrepel::geom_text_repel(data = gene_loadings, 
+  geom_text(data = gene_loadings, 
             aes(x = PC1, y = PC2, label = gene),
             nudge_y = 0.005, size = 3) +
   scale_x_continuous(expand = c(0.02, 0.02))
 ```
 
+Note that in the plot above:
+
+* we used the autoplot function to make the main PCA plot as before
+* but both the `geom_segment()` and `geom_text()` layers use a different dataset, 
+which we specifically included _inside the geometry_ with `data = gene_loadings` 
+
 This is still a bit crowded, but you can play around with these commands to 
-improve the visualisation (e.g. restrict the number of genes even more).
+improve the visualisation (e.g. restrict the number of genes even more). Another 
+possibility is to use the `geom_text_repel()` from the [`ggrepel`](https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html) 
+package.
 
 Note that although this analysis gives some indication of how much influence a 
 particular gene has along each PC, it is not a replacement for specialised 
