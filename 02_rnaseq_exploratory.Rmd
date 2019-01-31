@@ -292,7 +292,7 @@ trans_cts_long %>%
   group_by(gene) %>% 
   summarise(mean_cts = mean(cts),
             var_cts = var(cts)) %>% 
-  ggplot(aes(mean_cts, var_cts/mean_cts)) +
+  ggplot(aes(mean_cts, var_cts)) +
   geom_point()
 ```
 
