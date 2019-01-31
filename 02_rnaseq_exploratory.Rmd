@@ -194,17 +194,31 @@ this?
 ----
 
 Because we have so many samples, it would be nice to get an overview of the correlation 
-across all samples. One way to do this is with a correlation plot. The `corrr` 
-package provides with several convenience functions to calculate and visualise 
-correlations. We won't go into details in this lesson, but do check the 
-[package's documentation](https://cran.r-project.org/web/packages/corrr/vignettes/using-corrr.html)
-if you are interested in knowing more. Here is a quick example:
+across all samples. One way to do this is with a correlation plot. The `corrplot` 
+package provides with a convenient plotting function to help us visualise correlation 
+matrix. We won't go into details in this lesson, but do check the 
+[package's documentation](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html)
+if you are interested in knowing more. 
+
+To achieve our goal, we first have to calculate the gene expression correlation 
+between every pair of samples. We can use the `cor()` function to do this, and 
+give it our matrix of gene counts:
 
 ```{r}
-library(corrr)
-correlate(trans_cts, method = "spearman") %>% 
-  rplot() + 
-  theme(axis.text.x = element_text(angle = 90))
+# Calculate all correlations using Spearman's method
+trans_cts_corr <- cor(trans_cts, method = "spearman")
+
+# Visualise the correlations between the first 5 samples
+trans_cts_corr[1:5, 1:5]
+```
+
+Now, we can use the `corrplot` package to help us visualise this:
+
+```{r}
+library(corrplot)
+
+corrplot(trans_cts_corr, 
+         method = "circle", cl.lim = c(0.8, 1), is.corr = FALSE) 
 ```
 
 
