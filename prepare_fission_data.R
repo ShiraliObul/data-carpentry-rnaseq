@@ -26,18 +26,12 @@ dds <- DESeq(dds)
 
 # Make a contrast between first and other time points for WT
 test_result <- lapply(c("15", "30", "60", "120", "180"), function(t){
-  res <- results(dds, contrast = c("minute", t, "0"), tidy = TRUE, lfcThreshold = 1) %>% 
+  res <- results(dds, contrast = c("minute", t, "0"), tidy = TRUE, lfcThreshold = 1) %>%
     as_tibble()
   res$comparison <- as.numeric(t)
   return(res)
 })
 test_result <- do.call("rbind", test_result)
-
-# test_result <- results(dds , contrast = c("minute", "180", "0"), tidy = TRUE) %>% 
-#   as_tibble()
-# 
-# # Retain only genes with FDR < 5%
-# test_result <- test_result[test_result$padj < 0.05, ]
 
 # Rename first column
 names(test_result)[1] <- "gene"
@@ -47,10 +41,10 @@ names(test_result)[1] <- "gene"
 # Gene counts ----
 #
 # Extract raw counts
-norm_cts <- counts(dds, normalized = TRUE)
+raw_cts <- counts(dds, normalized = TRUE)
 
 # Applying normalization to data (ignoring design) - for clustering, etc.
-trans_cts <- vst(dds, blind = TRUE) %>% assay()
+norm_cts <- vst(dds, blind = TRUE) %>% assay()
 
 # Get sample information
 sample_info <- colData(dds) %>% as.data.frame() %>% as_tibble(rownames = "sample")
@@ -60,7 +54,7 @@ sample_info <- sample_info[, c("sample", "strain", "minute", "replicate")]  # re
 #
 # Save objects ----
 #
-save(norm_cts, trans_cts, sample_info, test_result,
+save(raw_cts, norm_cts, sample_info, test_result,
      file = "data/fission_data.RData", compress = "bzip2")
 
 
