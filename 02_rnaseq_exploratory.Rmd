@@ -35,8 +35,8 @@ library(tidyverse)
 load("data/fission_data.RData")
 
 # Convert matrix to tibble
-trans_cts_tbl <- as_tibble(trans_cts, rownames = "gene")
 norm_cts_tbl <- as_tibble(norm_cts, rownames = "gene")
+raw_cts_tbl <- as_tibble(raw_cts, rownames = "gene")
 ```
 
 
@@ -44,10 +44,10 @@ norm_cts_tbl <- as_tibble(norm_cts, rownames = "gene")
 
 We will start our data exploration by understanding how our expression data are 
 distributed in each sample. We could do this, for example, using frequency polygons 
-(similar to histograms) for our expression data found in the `trans_cts` object.
+(similar to histograms) for our expression data found in the `norm_cts` object.
 
 ```{r, echo=FALSE}
-trans_cts %>%
+norm_cts %>%
   as_tibble(rownames = "gene") %>% 
   gather("sample", "cts", -gene) %>% 
   left_join(sample_info, by = "sample") %>% 
@@ -59,7 +59,7 @@ trans_cts %>%
 
 To produce the plot above, we need to do a few things:
 
-1. Convert our table of counts (`trans_cts_tbl`) to "long" format, i.e. with 3 
+1. Convert our table of counts (`norm_cts_tbl`) to "long" format, i.e. with 3 
 columns: `gene`, `sample`, `cts`, rather than one column per sample
 3. Join this table with the `sample_info` table 
 
@@ -85,16 +85,16 @@ Like so:
 
 ```{r}
 # "gather" the counts data
-trans_cts_long <- trans_cts_tbl %>% 
+norm_cts_long <- norm_cts_tbl %>% 
   gather("sample", "cts", wt_0_r1:mut_180_r3)
 
-trans_cts_long
+norm_cts_long
 ```
 
 If we wanted to do the reverse, we could use the `spread()` function:
 
 ```{r}
-trans_cts_long %>% 
+norm_cts_long %>% 
   spread(sample, cts)
 ```
 
@@ -105,7 +105,7 @@ for another example of using these functions)
 
 **Exercise:**
 
-* Convert the `norm_cts_tbl` created above to a "long" format using the `gather()` function
+> Convert the `raw_cts_tbl` created above to a "long" format using the `gather()` function
 
 ----
 
@@ -119,7 +119,7 @@ gene expression table.
 sample_info
 ```
 
-We can do this by _joining_ the `trans_cts_long` table with the `sample_info` table.
+We can do this by _joining_ the `norm_cts_long` table with the `sample_info` table.
 
 Joining tables is an important task that is often needed in multi-layered data.
 
@@ -137,9 +137,9 @@ table, so there's a few different kinds of joins that would work.
 For safety, let's use `full_join()`, to ensure we retain all data from both tables:
 
 ```{r}
-trans_cts_long <- full_join(trans_cts_long, sample_info, by = ("sample"))
+norm_cts_long <- full_join(norm_cts_long, sample_info, by = ("sample"))
 
-trans_cts_long
+norm_cts_long
 ```
 
 We can join tables by more than one column, which is not necessary here.
@@ -151,7 +151,7 @@ Now that we have our expression data in a "tidy" format, we can explore our
 gene's expression distribution:
 
 ```{r}
-trans_cts_long %>%
+norm_cts_long %>%
   ggplot(aes(cts, colour = replicate)) + 
   geom_freqpoly(binwidth = 1) + 
   facet_grid(strain ~ minute)
@@ -161,8 +161,8 @@ trans_cts_long %>%
 
 **Exercise:**
 
-* Try out other ways to visualise these data, for example as a boxplot of expression data
-* Can you produce a boxplot of distribution of raw count data? (hint: you might want to try 
+> * Try out other ways to visualise these data, for example as a boxplot of expression data
+> * Can you produce a boxplot of distribution of raw count data? (hint: you might want to try 
 log-transforming the data)
 
 ----
@@ -176,7 +176,7 @@ For this type of plot, the "spread" version of our counts table is useful. For e
 let's look at the correlation between two replicates of WT at 0 min:
 
 ```{r}
-trans_cts_tbl %>% 
+norm_cts_tbl %>% 
   ggplot(aes(wt_0_r1, wt_0_r2)) + geom_point() +
   geom_abline(colour = "brown")
 ```
@@ -188,8 +188,7 @@ are biological replicates of the same strain and treatment!
 
 **Exercise:**
 
-* Compare the expression between a WT cell at T0 and T30. What can you conclude from 
-this?
+> Compare the expression between a WT cell at T0 and T30. What can you conclude from this?
 
 ----
 
@@ -206,10 +205,10 @@ give it our matrix of gene counts:
 
 ```{r}
 # Calculate all correlations using Spearman's method
-trans_cts_corr <- cor(trans_cts, method = "spearman")
+norm_cts_corr <- cor(norm_cts, method = "spearman")
 
 # Visualise the correlations between the first 5 samples
-trans_cts_corr[1:5, 1:5]
+norm_cts_corr[1:5, 1:5]
 ```
 
 Now, we can use the `corrplot` package to help us visualise this:
@@ -217,24 +216,24 @@ Now, we can use the `corrplot` package to help us visualise this:
 ```{r}
 library(corrplot)
 
-corrplot(trans_cts_corr, 
+corrplot(norm_cts_corr, 
          method = "circle", cl.lim = c(0.8, 1), is.corr = FALSE) 
 ```
 
 
 # Properties of count data
 
-So far we have looked at RNA-Seq data that has been preprocessed for us (`trans_cts`) 
+So far we have looked at RNA-Seq data that has been preprocessed for us (`norm_cts`) 
 using a sophisticated method (`DESeq2`). 
 
-In the following, we will also take a look at the raw normalised data (`norm_cts`) and 
+In the following, we will also take a look at the raw normalised data (`raw_cts`) and 
 compare these to the transformed version to explore what is achieve by it.
 
 Make sure that you have a "tidy" version of these raw normalised counts:
 
 ```{r}
-norm_cts_tbl <- as_tibble(norm_cts, rownames = "gene")
-norm_cts_long <- norm_cts_tbl %>% 
+raw_cts_tbl <- as_tibble(raw_cts, rownames = "gene")
+raw_cts_long <- raw_cts_tbl %>% 
   gather(sample, cts, -gene) %>% 
   full_join(sample_info)
 ```
@@ -243,17 +242,17 @@ The summary function is quite handy here as a first approach to exploring differ
 between raw and normalized counts.
 
 ```{r}
+summary(raw_cts_long$cts)
 summary(norm_cts_long$cts)
-summary(trans_cts_long$cts)
 ```
 
-Raw and normalized data live on VERY different scales - the `norm_cts_long` has a 
+Raw and normalized data live on VERY different scales - the `raw_cts_long` has a 
 few very large count values while most values are comparatively small. Partially,
 this is because the transformed counts are on a log-scale. Let's visualise 
 the correlation between two samples like we did above, but for these raw counts:
 
 ```{r}
-norm_cts_tbl %>% 
+raw_cts_tbl %>% 
   ggplot(aes(wt_0_r1, wt_0_r2)) + 
   geom_point()
 ```
@@ -265,7 +264,7 @@ directly on the plot:
 
 ```{r}
 # We add a "pseudocount" of 1 to the count data because otherwise log(0) = -Inf
-norm_cts_tbl %>% 
+raw_cts_tbl %>% 
   ggplot(aes(wt_0_r1 + 1, wt_0_r2 + 1)) + 
   geom_point() +
   scale_x_continuous(trans = "log2") + 
@@ -278,7 +277,7 @@ mean and variance of each gene across all samples:
 
 ```{r}
 # Summarise the data per gene, calculating mean and variance
-norm_cts_long %>% 
+raw_cts_long %>% 
   group_by(gene) %>% 
   summarise(mean_cts = mean(cts),
             var_cts = var(cts)) %>% 
@@ -302,7 +301,7 @@ count data).
 Compare this with the normalised data:
 
 ```{r}
-trans_cts_long %>% 
+norm_cts_long %>% 
   group_by(gene) %>% 
   summarise(mean_cts = mean(cts),
             var_cts = var(cts)) %>% 

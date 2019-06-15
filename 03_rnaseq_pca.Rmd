@@ -75,7 +75,7 @@ based on gene expression (_variables_ = _columns_). For that reason, we need
 to provide a _transposed_ version of our table to the `prcomp()` function:
 
 ```{r}
-sample_pca <- prcomp(t(trans_cts))
+sample_pca <- prcomp(t(norm_cts))
 ```
 
 We can quickly visualise how our samples look like projected onto the new principal 
@@ -163,7 +163,7 @@ tidy(sample_pca, matrix = "pcs") %>%
 You can see how successive PCs explain less and less of the total variance in the 
 original data. Also note that `r length(sample_pca$sdev)` components are enough to 
 virtually explain _all_ of the variance in our dataset. 
-That's a huge dimensionality reduction from `r nrow(trans_cts)` variables (genes) 
+That's a huge dimensionality reduction from `r nrow(norm_cts)` variables (genes) 
 down to just `r length(sample_pca$sdev)`!
 
 

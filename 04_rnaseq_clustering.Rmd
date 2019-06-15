@@ -32,8 +32,8 @@ library(tidyverse)
 load("data/fission_data.RData")
 
 # get long-formatted table (produced in previous lesson)
-trans_cts_tbl <- as_tibble(trans_cts, rownames = "gene")
-trans_cts_long <- trans_cts_tbl %>% 
+norm_cts_tbl <- as_tibble(norm_cts, rownames = "gene")
+norm_cts_long <- norm_cts_tbl %>% 
   gather(sample, cts, -gene) %>% 
   full_join(sample_info)
 ```
@@ -129,21 +129,21 @@ We then use this vector to subset out table of transformed counts and summarise 
 counts to get average counts per time point:
 
 ```{r}
-trans_cts_mean <- trans_cts_long %>% 
+norm_cts_mean <- norm_cts_long %>% 
   filter(gene %in% candidate_genes) %>% 
   group_by(gene, strain, minute) %>% 
   summarise(mean_cts = mean(cts),
             nrep = n()) %>% 
   ungroup()
 
-head(trans_cts_mean)
+head(norm_cts_mean)
 ```
 
 We want to explore _patterns_ of expression across time in the two strains. 
 We can plot each gene's expression across time, but the result is very confusing!
 
 ```{r}
-trans_cts_mean %>% 
+norm_cts_mean %>% 
   ggplot(aes(minute, mean_cts)) +
   geom_line(aes(group = gene), alpha = 0.3) +
   facet_grid(strain ~ .)
@@ -173,7 +173,7 @@ In R, we can use the function scale to do this transformation.
 Let's re-do our data summary, but scale the each gene's expression data first:
 
 ```{r}
-trans_cts_mean <- trans_cts_long %>% 
+norm_cts_mean <- norm_cts_long %>% 
   # filter to retain only genes of interest
   filter(gene %in% candidate_genes) %>% 
   # for each gene
@@ -192,7 +192,7 @@ And now we can re-do the plot, and see how this transformation changes our
 perception of the data:
 
 ```{r}
-trans_cts_mean %>%
+norm_cts_mean %>%
   ggplot(aes(minute, mean_cts_scaled)) +
   geom_line(aes(group = gene), alpha = 0.2) + 
   geom_hline(yintercept = 0, colour = "brown", linetype = "dashed") +
@@ -227,7 +227,7 @@ second step.
 ## Calculating distance between samples using `dist()`
 
 The `dist()` function works best with a _matrix_ of data. Therefore, we're going 
-to use our original matrix of counts stored in `trans_cts`. However, we do not want 
+to use our original matrix of counts stored in `norm_cts`. However, we do not want 
 to use all of the genes in that matrix, but rather the subset of genes that we 
 think are differentially expressed between time points. 
 
@@ -236,7 +236,7 @@ Because the rows on our matrix are named, we can use our vector of gene names
 created above (`candidate_genes`) to do this:
 
 ```{r, eval=FALSE}
-trans_cts[candidate_genes, ]
+norm_cts[candidate_genes, ]
 ```
 
 After this step, we want to **scale** the data (to obtain z-scores). The `scale()` 
@@ -248,7 +248,7 @@ first transpose our matrix, then scale, then transpose it back again.
 We can do it with pipes, which makes the order of operations quite clear:
 
 ```{r, eval=FALSE}
-trans_cts[candidate_genes, ] %>% 
+norm_cts[candidate_genes, ] %>% 
   # transpose the matrix so genes are as columns
   t() %>% 
   # apply scalling to each column of the matrix (genes)
@@ -261,7 +261,7 @@ Finally, we can complete this pipeline by calculating the distance between each
 gene (_row_) in our matrix:
 
 ```{r}
-gene_dist <- trans_cts[candidate_genes, ] %>% 
+gene_dist <- norm_cts[candidate_genes, ] %>% 
   t() %>% 
   scale() %>% 
   t() %>% 
@@ -325,16 +325,16 @@ First, let's join our table with gene clusters to the table of gene summarised
 counts that we produced above:
 
 ```{r}
-trans_cts_cluster <- trans_cts_mean %>% 
+norm_cts_cluster <- norm_cts_mean %>% 
   inner_join(gene_cluster, by = "gene")
 
-head(trans_cts_cluster)
+head(norm_cts_cluster)
 ```
 
 And now we can make a plot, facetting according to `strain` and `cluster`:
 
 ```{r}
-trans_cts_cluster %>% 
+norm_cts_cluster %>% 
   ggplot(aes(minute, mean_cts_scaled)) +
   geom_line(aes(group = gene)) +
   facet_grid(strain ~ cluster)
@@ -356,7 +356,7 @@ Finally, here is an advanced `ggplot2` trick to add a line to each facet showing
 the median expression in each cluster:
 
 ```{r}
-trans_cts_cluster %>% 
+norm_cts_cluster %>% 
   ggplot(aes(minute, mean_cts_scaled)) +
   geom_line(aes(group = gene), alpha = 0.3) +
   geom_line(stat = "summary", fun.y = "median", colour = "brown", size = 1.5, 

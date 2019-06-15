@@ -26,7 +26,7 @@
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
+<style type="text/css" data-origin="pandoc">
 div.sourceCode { overflow-x: auto; }
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
   margin: 0; padding: 0; vertical-align: baseline; border: none; }
@@ -62,7 +62,29 @@ code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
 code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
 code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 <style type="text/css">
   pre:not([class]) {
     background-color: white;
@@ -98,9 +120,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type="text/css">
 .main-container {
@@ -125,21 +145,82 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
 
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -228,6 +309,16 @@ div.tocify {
 
 </style>
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
 <div class="col-xs-12 col-sm-4 col-md-3">
@@ -268,10 +359,11 @@ div.tocify {
 </ul>
 <p>Let’s say that you did this experiment yourself, and that a bioinformatician analysed it and provided you with four things:</p>
 <ul>
-<li>Information about each sample</li>
-<li>Read counts for all genes (a measure of the genes’ expression) simply normalised to the size of each library (to account for the fact that different samples have more or less total number of reads)</li>
-<li>Normalised read counts for all genes but on a log scale and transformed to correct for a dependency between the mean and variance, which is typical in such count data</li>
-<li>Results from a statistical test that assessed the likelihood of your data assuming no difference between the first each of the other time points in WT cells</li>
+<li>Information about each sample.</li>
+<li>‘Raw’ read counts for all genes, which gives a measure of the genes’ expression. (these are simply scaled to the size of each library to account for the fact that different samples have more or less total number of reads).</li>
+<li>Normalised read counts for all genes, on a log scale and transformed to correct for a dependency between the mean and variance, which is typical in such count data (we will explore this property of the data ourselves).</li>
+<li>Results from a statistical test that assessed the probability of observed expression differences<br />
+between the first and each of the other time points in WT cells, assuming a null hypothesis of no difference.</li>
 </ul>
 </div>
 <div id="getting-started" class="section level1">
@@ -306,10 +398,10 @@ div.tocify {
 <hr />
 <div id="matrix-object" class="section level3">
 <h3>Matrix object</h3>
-<p>You might have noticed that <code>trans_cts</code> is a <code>matrix</code> object. We haven’t found these before, and to produce visualisations of our data, it is convenient to start by converting our matrix of gene expression to a <code>tibble</code> (<code>data.frame</code>).</p>
+<p>You might have noticed that <code>norm_cts</code> is a <code>matrix</code> object. We haven’t found these before, and to produce visualisations of our data, it is convenient to start by converting our matrix of gene expression to a <code>tibble</code> (<code>data.frame</code>).</p>
 <p>Matrices are a bit similar to <code>data.frame</code>, but they only contain values of a single type, in this case numeric values (whereas in a <code>data.frame</code> different columns can contain different types of data).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Look at the first 10 rows and first 5 samples of trans_cts</span>
-trans_cts[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Look at the first 10 rows and first 5 samples of norm_cts</span>
+norm_cts[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</code></pre></div>
 <pre><code>##              wt_0_r1  wt_0_r2  wt_0_r3 wt_15_r1 wt_15_r2
 ## SPAC212.11  4.947329 4.969572 5.657995 5.452545 5.444799
 ## SPAC212.09c 5.443589 6.205209 6.172470 5.943911 6.333457
@@ -324,7 +416,7 @@ trans_cts[<span class="dv">1</span><span class="op">:</span><span class="dv">10<
 <p>You will also notice that gene names are contained in the row names of this matrix (they are not a column of their own!).</p>
 <p>To convert this matrix into a <code>tibble</code> object we can use the function <code>as_tibble()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Convert matrix to tibble</span>
-<span class="kw">as_tibble</span>(trans_cts)</code></pre></div>
+<span class="kw">as_tibble</span>(norm_cts)</code></pre></div>
 <pre><code>## # A tibble: 6,011 x 36
 ##    wt_0_r1 wt_0_r2 wt_0_r3 wt_15_r1 wt_15_r2 wt_15_r3 wt_30_r1 wt_30_r2
 ##      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
@@ -348,8 +440,8 @@ trans_cts[<span class="dv">1</span><span class="op">:</span><span class="dv">10<
 ## #   mut_180_r1 &lt;dbl&gt;, mut_180_r2 &lt;dbl&gt;, mut_180_r3 &lt;dbl&gt;</code></pre>
 <p>But now we’ve lost our gene names! If we look at the function’s help (<code>?as_tibble</code>), we can see that there’s a way to solve this problem:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Convert matrix to tibble - add colnames to a new column called &quot;gene&quot;</span>
-trans_cts_tbl &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(trans_cts, <span class="dt">rownames =</span> <span class="st">&quot;gene&quot;</span>)
-trans_cts_tbl</code></pre></div>
+norm_cts_tbl &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(norm_cts, <span class="dt">rownames =</span> <span class="st">&quot;gene&quot;</span>)
+norm_cts_tbl</code></pre></div>
 <pre><code>## # A tibble: 6,011 x 37
 ##    gene  wt_0_r1 wt_0_r2 wt_0_r3 wt_15_r1 wt_15_r2 wt_15_r3 wt_30_r1
 ##    &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
@@ -373,9 +465,9 @@ trans_cts_tbl</code></pre></div>
 ## #   mut_120_r3 &lt;dbl&gt;, mut_180_r1 &lt;dbl&gt;, mut_180_r2 &lt;dbl&gt;, mut_180_r3 &lt;dbl&gt;</code></pre>
 <hr />
 <p><strong>Exercise:</strong></p>
-<ul>
-<li>Convert the <code>norm_cts</code> matrix to a tibble and save it into a new object called <code>norm_cts_tbl</code></li>
-</ul>
+<blockquote>
+<p>Convert the <code>raw_cts</code> matrix to a tibble and save it into a new object called <code>raw_cts_tbl</code></p>
+</blockquote>
 <hr />
 <hr />
 <p><a href="https://tavareshugo.github.io/data-carpentry-rnaseq/">back to lesson’s homepage</a></p>
