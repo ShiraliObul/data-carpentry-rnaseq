@@ -26,7 +26,7 @@ course!), but rather to show you how the data manipulation principles learned
 so far can be applied to explore these kind of data. 
 
 If you are doing RNAseq analysis, you should use 
-[dedicated packages and workflows](https://www.bioconductor.org/help/workflows/rnaseqGene/), 
+[dedicated packages and workflows](http://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html), 
 which implement models to account for particular features of these data.
 
 If you are interested, you can see [how the data for this lesson was pre-processed](https://github.com/tavareshugo/data-carpentry-rnaseq/blob/master/prepare_fission_data.R) 
