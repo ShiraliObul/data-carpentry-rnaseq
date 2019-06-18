@@ -54,9 +54,16 @@ sample_info <- sample_info[, c("sample", "strain", "minute", "replicate")]  # re
 #
 # Save objects ----
 #
-save(raw_cts, norm_cts, sample_info, test_result,
-     file = "data/fission_data.RData", compress = "bzip2")
+# save(raw_cts, norm_cts, sample_info, test_result,
+#      file = "data/fission_data.RData", compress = "bzip2")
 
+raw_cts %>%
+  as_tibble(rownames = "gene") %>%
+  readr::write_csv("./data/counts_raw.csv")
 
+norm_cts %>%
+  as_tibble(rownames = "gene") %>%
+  readr::write_csv("./data/counts_transformed.csv")
 
-
+readr::write_csv(sample_info, "./data/sample_info.csv")
+readr::write_csv(test_result, "./data/test_result.csv")

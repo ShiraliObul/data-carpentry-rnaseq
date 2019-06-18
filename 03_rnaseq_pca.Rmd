@@ -18,7 +18,8 @@ knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
 # Lesson Objectives
 
 * Gain an intuitive understanding of principal component analysis (PCA)
-* Apply PCA to understand the structure in multi-dimensional datasets such as RNAseq
+* Apply PCA using R's `prcomp()` function and understand the structure of the resulting object
+* Use PCA to derive information about structure in multi-dimensional datasets such as RNAseq
 
 ```{r, echo = FALSE, message = FALSE}
 # In the repository data is read from the current directory
@@ -26,7 +27,10 @@ knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
 library(tidyverse)
 
 # Load the data
-load("data/fission_data.RData")
+raw_cts <- read_csv("./data/counts_raw.csv")
+trans_cts <- read_csv("./data/counts_transformed.csv")
+sample_info <- read_csv("./data/sample_info.csv")
+test_result <- read_csv("./data/test_result.csv")
 ```
 
 
@@ -41,7 +45,7 @@ There are several methods to help summarise multi-dimensional data, here
 we will show how to use PCA (principal component analysis). 
 
 PCA is a transformation of high-dimensional data into an orthogonal basis such that 
-first principal component (PC, aka "axis"") is aligned with the largest source of 
+first principal component (PC, aka "axis") is aligned with the largest source of 
 variance, the second PC to the largest remaining source of variance and so on. 
 This makes high-dimensional data more amenable to visual exploration, as we can 
 examine projections to the first two (or few) PCs.
@@ -52,16 +56,21 @@ examine projections to the first two (or few) PCs.
 There are three basic types of information we obtain from a PCA:
 
 * PC scores - these are the coordinates of our samples on the new PC axis
-* Eigen values - these represent the variance explained by each PC. 
+* Eigenvalues - these represent the variance explained by each PC. 
 We can use these to calculate the proportion of variance in the original data 
 that each axis explains.
-* Eigen vectors - these reflect the "weight" that each variable has on a particular 
+* Variable loadings (eigenvectors) - these reflect the "weight" that each variable has on a particular 
 PC. These can be thought of as the correlation between the PC and the original variable.
 
 See this article for a nice introduction to this topic, which also uses transcriptome 
 data: 
 Jake Lever, Martin Krzywinski & Naomi Altman (2017) [Principal component analysis](https://www.nature.com/articles/nmeth.4346),
 Nature Methods 14, 641–642
+
+Also see these two videos from StatQuest, by Josh Starmer (or just watch all of them!): 
+
+* [Principal Component Analysis (PCA), Step-by-Step](https://youtu.be/FgakZw6K1QQ)
+* [PCA - Practical Tips](https://youtu.be/oRvgq966yZg)
 
 
 # Running PCA using `prcomp()`
@@ -75,29 +84,118 @@ based on gene expression (_variables_ = _columns_). For that reason, we need
 to provide a _transposed_ version of our table to the `prcomp()` function:
 
 ```{r}
-sample_pca <- prcomp(t(norm_cts))
+# Create a matrix from our table of counts
+pca_matrix <- trans_cts %>% 
+  # exclude the gene column
+  select(-gene) %>% 
+  # coerce to a matrix
+  as.matrix()
+
+# Assign row names to the matrix
+rownames(pca_matrix) <- trans_cts$gene
+
+# Transpose the matrix so that rows = samples and columns = variables
+pca_matrix <- t(pca_matrix)
+
+# Perform the PCA
+sample_pca <- prcomp(pca_matrix)
 ```
 
-We can quickly visualise how our samples look like projected onto the new principal 
-component space using the `autoplot()` function from the `ggfortify` package:
+----
+
+**Exercise:**
+
+> Examine the output of the `prcomp()` function.
+
+[Link to exercise](exercises.html#31_examine_prcomp()_output)
+
+----
+
+#### A note about matrices
+
+A `matrix` is another type of object in R. 
+Matrices are a bit similar to `data.frame`, but they only contain values of a 
+single type, in this case numeric values (whereas in a `data.frame` different 
+columns can contain different types of data). 
+
+In bioinformatics packages you will often have data stored in these matrix objects. 
+It is therefore useful to know how to access values in them and how to convert them 
+to a `data.frame`.
+
+You can access values in a matrix using `[rows, columns]` notation:
 
 ```{r}
-library(ggfortify)
-autoplot(sample_pca)
+# Look at the first 10 rows and first 5 columns of the matrix
+pca_matrix[1:10, 1:5]
+```
+
+To convert this matrix into a `tibble` object we can use the function `as_tibble()`:
+
+```{r, results=FALSE}
+# Convert matrix to tibble
+as_tibble(pca_matrix)
+```
+
+But now we've lost our sample names (which were the row names of the matrix)! 
+If we look at the function's help (`?as_tibble`), we can see that there's a way 
+to solve this problem:
+
+```{r, results=FALSE}
+# Convert matrix to tibble - add colnames to a new column called "gene"
+as_tibble(pca_matrix, rownames = "sample")
+```
+
+Now you know how to convert a `matrix` to a `data.frame`, which can be a very handy 
+trick to have!
+
+
+### Visualising samples on PC space
+
+`prcomp()` returns an oject of its own class. To access individual elements from 
+this object, we use the `$` notation, similarly to how you can access individual 
+columns from a _data.frame_. 
+
+For example, let's create a plot with our samples plotted on the new PC axis. 
+
+```{r}
+# The PC scores are stored in the "x" value of the prcomp object, which is a matrix
+pc_scores <- sample_pca$x 
+
+# Make PCA plot
+pc_scores %>% 
+  # convert it to a tibble retaining the sample names as a new column
+  as_tibble(rownames = "sample") %>% 
+  # create the plot
+  ggplot(aes(x = PC1, y = PC2)) +
+  geom_point()
 ```
 
 This is a very simple plot, but already we can see there is some structure in our 
 data, suggesting clusters of samples that are more similar to each other.
 
-There's also information about how much variation each principal component axis 
-explains. 
 
-We can annotate this plot further by providing the `autoplot()` function with 
-our sample information data (see `?autoplot.prcomp` for more information):
+----
 
-```{r}
-autoplot(sample_pca, data = sample_info, colour = "minute", shape = "strain")
+**Exercise:**
+
+> Modify the code above to recreate the plot below. Save the plot in an object called `pca_plot`
+
+[Link to exercise](exercises.html#32_annotating_pc_plot)
+
+```{r, echo=FALSE}
+# The PC scores are stored in the "x" value of the prcomp object, which is a matrix
+pca_plot <- sample_pca$x %>% 
+  # convert it to a tibble retaining the sample names as a new column
+  as_tibble(rownames = "sample") %>% 
+  # join with "sample_info" table 
+  full_join(sample_info, by = "sample") %>% 
+  # create the plot
+  ggplot(aes(x = PC1, y = PC2, colour = factor(minute), shape = strain)) +
+  geom_point()
+pca_plot
 ```
+
+----
 
 From this plot, we can see that:
 
@@ -109,7 +207,9 @@ be distinguishable if we explore other PC axis!).
 it doesn't mean that no genes differ between the genotypes, just that they don't 
 explain most of the variance captured by PC1 and PC2)
 
-Note that often it is good practice to _standardize_ the variables before doing the PCA. 
+**Important note:**
+
+Often it is a good idea to _standardize_ the variables before doing the PCA. 
 This is often done by _centering_ the data on the mean and then _scaling_ it by 
 dividing by the standard deviation. This ensures that the PCA is not too influenced 
 by genes with higher absolute expression. By default, the `prcomp()` function 
@@ -118,25 +218,20 @@ this default behaviour. In this case, because we are using the
 transformed data, this is not too much of an issue, but try re-running the PCA 
 with the _centered_ and _scaled_ data to see how it changes it. 
 
+Note that _scaling_ is particularly recommended if your variables are on different 
+scales.
+
 We talk more about standardizing gene expression data in the 
 [gene clustering lesson](04_rnaseq_clustering.html).
 
 
-# Exploring PCA output
-
-The above visualisation can be enough for what we are trying to answer, but we 
-can go deeper into understanding our PCA. Namely:
-
-* How many PCs do we have and how much variance do they explain?
-* Which genes have the most influence on each PC axis? 
-
-To answer these questions we need to access information about _eigenvalues_ and 
-_eigenvectors_ of our PCA. 
-
 ### Variance explained by PCs
 
+Another important question to ask after we do a PCA is how many PCs we have and 
+how much variance they explain.
+
 We need to extract the variance explained by each PC from our `sample_pca` object.
-We could do this "manually", using `sample_pca$sdev`, but instead we will use a 
+We could do this "manually", using `sample_pca$sdev^2`, but instead we will use a 
 function from the [`broom` package](https://cran.r-project.org/web/packages/broom/vignettes/broom.html)
 which conveniently formats the data for plotting:
 
@@ -162,55 +257,41 @@ tidy(sample_pca, matrix = "pcs") %>%
 
 You can see how successive PCs explain less and less of the total variance in the 
 original data. Also note that `r length(sample_pca$sdev)` components are enough to 
-virtually explain _all_ of the variance in our dataset. 
-That's a huge dimensionality reduction from `r nrow(norm_cts)` variables (genes) 
-down to just `r length(sample_pca$sdev)`!
+virtually explain _all_ of the variance in our dataset. This makes sense in this 
+case since we only have 36 biological samples.
+
 
 
 ### Exploring correlation between genes and PCs
 
-Let's say we want to know which genes have the highest influence along PC1 and PC2 that 
-we plotted above. Usually, this type of question is answered by using a [biplot](https://en.wikipedia.org/wiki/Biplot).
+Finally, to be able to interpret our PC-axis we need to ask the question of 
+which genes have the most influence on each PC axis. This information is contained 
+in the variable loadings of the PCA, within the `rotation` value of the `prcomp` object.
 
-You can easily produce such a plot using the `autoplot()` function by adding the 
-options `loadings = TRUE, loadings.label = TRUE`:
-
-```{r, eval=FALSE}
-# Example using iris dataset
-autoplot(prcomp(iris[, -5]), data = iris, colour = "Species",
-         loadings = TRUE, loadings.label = TRUE)
-```
-
-However, because we have thousands of genes, this would be completely incomprehensible 
-on our data (and probably crash your computer!).
-
-Instead, for big data like this, we will have to be more selective and focus on a few 
-genes only. 
-
-First, let's extract the eigenvectors of each PC from our `sample_pca` object. 
-
-We can do this "manually" with the following command, which returns a 
-matrix (and we convert it to a `tibble`):
+We have seen how to extract the variable loadings "manually":
 
 ```{r}
+# extract values
 sample_pca$rotation %>% 
+  # convert to a tibble
   as_tibble(rownames = "gene")
 ```
 
-Or we can again use the `broom` package, which instead returns a table in a "long" 
+But, again, we can use the `broom` package, which instead returns a table in a "long" 
 format:
 
 ```{r}
-tidy(sample_pca, matrix = "variables")  # variable loadings (eigen vectors) for genes that were used as variables in PCA
+# variable loadings (eigen vectors) for genes that were used as variables in PCA
+tidy(sample_pca, matrix = "pcs")
 ```
 
 From these data, we can extract the genes with the highest eigenvalues along PC1 
-and PC2. Let's use the "long" formated data for this:
+and PC2 using some `dplyr`. 
 
 ```{r}
 top_genes <- tidy(sample_pca, matrix = "variables") %>%  
   # retain only PC1 and PC2
-  filter(PC %in% 1:2) %>%
+  filter(PC %in% c(1, 2)) %>%
   # for each PC
   group_by(PC) %>%
   # sort table by descending value
@@ -236,7 +317,7 @@ gene_loadings <- sample_pca$rotation %>%
 We can use this to draw vectors of each gene's loading projected onto each PC:
 
 ```{r}
-ggplot(gene_loadings) +
+loadings_plot <- ggplot(gene_loadings) +
   geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2), 
                arrow = arrow(length = unit(0.1, "in")),
                colour = "brown") +
@@ -244,38 +325,79 @@ ggplot(gene_loadings) +
             aes(x = PC1, y = PC2, label = gene),
             nudge_y = 0.005, size = 3) +
   scale_x_continuous(expand = c(0.02, 0.02))
+
+loadings_plot
 ```
 
-Alternatively, we add this to our PCA visualisation from before:
+Using the `patchwork` package, we put these two plots side by side to get a 
+more complete and interpretable view of our PCA analysis:
 
 ```{r}
-autoplot(sample_pca, data = sample_info, colour = "minute", shape = "strain") +
-  geom_segment(data = gene_loadings, 
-               aes(x = 0, y = 0, xend = PC1, yend = PC2), 
-               arrow = arrow(length = unit(0.1, "in")),
-               colour = "brown") +
-  geom_text(data = gene_loadings, 
-            aes(x = PC1, y = PC2, label = gene),
-            nudge_y = 0.005, size = 3) +
-  scale_x_continuous(expand = c(0.02, 0.02))
+library(patchwork)
+pca_plot + labs(tag = "A", title = "PC scores") +
+  loadings_plot + labs(tag = "B", title = "PC loadings") +
+  plot_layout(ncol = 2)
 ```
 
-Note that in the plot above:
 
-* we used the autoplot function to make the main PCA plot as before
-* but both the `geom_segment()` and `geom_text()` layers use a different dataset, 
-which we specifically included _inside the geometry_ with `data = gene_loadings` 
 
-This is still a bit crowded, but you can play around with these commands to 
-improve the visualisation (e.g. restrict the number of genes even more). Another 
-possibility is to use the `geom_text_repel()` from the [`ggrepel`](https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html) 
-package.
+## Shortcut for a quick visualisation
 
-Note that although this analysis gives some indication of how much influence a 
+This was all very useful to understand how PCA works and how to fully explore 
+its results. However, it can sometimes be convenient to produce these graphs 
+quickly. 
+
+We can use the `autoplot()` function from the `ggfortify` package to do this:
+
+```{r}
+library(ggfortify)
+autoplot(sample_pca)
+```
+
+There's also information about how much variation each principal component axis 
+explains. 
+
+We can annotate this plot further by providing the `autoplot()` function with 
+our sample information data (see `?autoplot.prcomp` for more information):
+
+```{r}
+autoplot(sample_pca, data = sample_info, colour = "minute", shape = "strain")
+```
+
+Finally, you _could_ easily add information about loadings to the plot by adding the 
+options `loadings = TRUE, loadings.label = TRUE`. But don't do it, because we 
+have thousands of genes, so the plot would be un-interpretable!
+
+```{r, eval=FALSE}
+# Example using iris dataset
+autoplot(prcomp(iris[, -5]), data = iris, colour = "Species",
+         loadings = TRUE, loadings.label = TRUE)
+```
+
+
+# Final thoughts
+
+PCA is an essential and very powerful technique for exploratory data analysis of 
+multivariate data. As you see from this example, we can quickly see how our 
+data is _structured_, based on transcriptome-wide signatures. 
+
+Note that lack of clustering in a PCA does not mean nothing is happening. Imagine an 
+RNAseq experiment where only a dozen genes changed due to your treatment. Because 
+there's few genes, transcriptome-wide you might not capture structure in the data. 
+
+In summary, although this analysis gives some indication of how much influence a 
 particular gene has along each PC, it is not a replacement for specialised 
 [statistical models](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8) 
 and [tools](https://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html) 
 that assess specific hypothesis for differential expression between conditions.
+
+Finally, it's worth pointing out that PCA is a linear algorithm. 
+There are modern methods for non-linear dimensionality reduction, 
+which can sometimes perform better than PCA (but perhaps less easily interpretable). 
+Two common methods are called _UMAP_ and _t-SNE_. 
+These can be found in the [`umap`](https://cran.r-project.org/web/packages/umap/vignettes/umap.html) and 
+[`Rtsne`](https://cran.r-project.org/web/packages/Rtsne/) packages, respectively.
+
 
 
 ----

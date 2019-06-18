@@ -1,0 +1,221 @@
+---
+title: "Exercises for Exploratory analysis of RNAseq data"
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+    toc_depth: 3
+    highlight: pygments
+    df_print: kable
+    code_folding: hide
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[back to lesson's homepage](https://tavareshugo.github.io/data-carpentry-rnaseq/)
+
+```{r, echo = FALSE, message = FALSE}
+# Load the tidyverse package
+library(tidyverse)
+
+# Load the data
+load("data/fission_data.RData")
+```
+
+# Intro
+
+## Import data
+
+1. Import the four CSV files into R and store in the following objects: 
+`raw_cts`, `trans_cts`, `sample_info` and `test_result`.
+2. How many samples did you have? 
+Was the design balanced (i.e. do all samples have the same number of replicates)?
+3. How many genes do you have gene expression levels for?
+
+```{r, results=FALSE, message=FALSE}
+# 1. Import data
+raw_cts <- read_csv("./data/counts_raw.csv")
+trans_cts <- read_csv("./data/counts_transformed.csv")
+sample_info <- read_csv("./data/sample_info.csv")
+test_result <- read_csv("./data/test_result.csv")
+
+# 2. number of samples is in the "sample_info" table
+nrow(sample_info)
+
+# 4. this can be taken from the table of counts
+nrow(trans_cts)
+```
+
+
+# Exploratory analysis of count data
+
+## Gather table
+
+Convert the `raw_cts` table to a "long" format using the `gather()` function.
+Save it into an object called `raw_cts_long`.
+
+```{r}
+raw_cts_long <- raw_cts %>% 
+  gather("sample", "cts", wt_0_r1:mut_180_r3)
+```
+
+## Join tables
+
+* Produce a similar plot for the raw count data. (hint: you might want to try 
+log-transforming the data).
+
+```{r, results=FALSE}
+# Join with sample information table
+raw_cts_long <- full_join(raw_cts_long, sample_info, by = ("sample"))
+
+# Make the plot
+raw_cts_long %>%
+  ggplot(aes(log10(cts), colour = replicate)) + 
+  geom_freqpoly(binwidth = 1) + 
+  facet_grid(strain ~ minute)
+```
+
+
+* Try out other ways to visualise these data, for example as a boxplot.
+
+```{r, results=FALSE}
+# Make a boxplot
+raw_cts_long %>%
+  # make sure minute is specified as a factor
+  ggplot(aes(factor(minute), log10(cts), colour = strain)) + 
+  geom_boxplot() + 
+  facet_grid(. ~ replicate)
+```
+
+
+## Scatterplot
+
+Compare the expression between a WT cell at T0 and T30. What can you conclude from this?
+
+```{r}
+# Scatterplot between T0 and T30
+# the correlation is lower than between replicates at T0, for example
+trans_cts %>% 
+  ggplot(aes(wt_0_r1, wt_30_r1)) + geom_point() +
+  geom_abline(colour = "brown")
+```
+
+
+
+# PCA
+
+## Examine `prcomp()` output
+
+```{r}
+sample_pca <- prcomp(t(trans_cts[, -1]))
+```
+
+
+After running the PCA investigate:
+
+1. What type of object is it? (hint: `class()`)
+2. What is the _structure_ of this object?  (hint: `str()`)
+3. Can you identify which parts of the object contain the _PC scores_, _eigenvalues_ and _variable loadings_? 
+(hint: check `prcomp()`'s help)
+4. Can you extract individual elements from this object? (hint: use `$`)
+    * Save the output in objects called `pc_scores`, `pc_eigenvalues` and `pc_loadings`
+    * what class is each of these elements?
+5. How many principal components do you have?
+
+```{r, results=FALSE}
+# 1. class of the object
+class(sample_pca)
+
+# 2. structure of the object
+str(sample_pca)
+
+# 3. checking the help ?prcomp, under the section "Value" is says:
+# "sdev" contains the standard deviation explained by each PC, so if we square it we get the eigenvalues (or explained variance)
+# "rotation" contains the variable loadings for each PC, which define the eigenvectors
+# "x" contains the PC scores, i.e. the data projected on the new PC axis
+# "center" in this case contains the mean of each gene, which was subtracted from each value
+# "scale" contains the value FALSE because we did not scale the data by the standard deviation
+
+# 4. we can use the 'dollar sign' to access these elements
+pc_scores <- sample_pca$x              # PC scores (a matrix)
+pc_eigenvalues <- sample_pca$sdev^2    # eigenvalues (a vector) - notice that we squared the values
+pc_loadings <- sample_pca$rotation     # variable loadings (a matrix)
+
+# 5. here's three ways to check this
+ncol(pc_scores)
+length(pc_eigenvalues)
+ncol(pc_loadings)
+```
+
+## Annotating PC plot
+
+Try to recreate the plot below. 
+You will need to _join_ the information about each sample and _colour_ 
+the points according to "minute" and their _shape_ according to "strain".
+
+
+```{r}
+pc_scores %>% 
+  # convert it to a tibble retaining the sample names as a new column
+  as_tibble(rownames = "sample") %>% 
+  # join with "sample_info" table 
+  full_join(sample_info, by = "sample") %>% 
+  # create the plot
+  ggplot(aes(x = PC1, y = PC2, colour = factor(minute), shape = strain)) +
+  geom_point()
+```
+
+
+
+# Exploring test results
+
+## MA plot
+
+Recreate the plot below from the `test_result` table. (hint: notice the x-axis is log-transformed)
+
+```{r}
+test_result %>% 
+  ggplot(aes(log10(baseMean), log2FoldChange)) +
+  geom_point(alpha = 0.1) +
+  facet_wrap( ~ comparison)
+```
+
+**Bonus:** try and re-create the plot below where the x-axis is on a log-scale but 
+showing the original units and genes with an adjusted p-value below 0.01 are highlighted 
+in red.
+
+```{r, warning=FALSE}
+test_result %>% 
+  # add column which contains value only if padj < 0.01
+  mutate(sig = ifelse(padj < 0.01, log2FoldChange, NA)) %>% 
+  # make the plot
+  ggplot(aes(baseMean, log2FoldChange)) +
+  geom_point(alpha = 0.1) +
+  geom_point(aes(y = sig), colour = "brown", size = 1) +
+  scale_x_continuous(trans = "log10") +
+  facet_wrap( ~ comparison)
+```
+
+
+Why is the fold-change log transformed? 
+
+```{r}
+# Because a fold-change (FC) is a ratio between two things FC = a/b
+# if a > b, then the FC can vary from 1 to infinity!
+# but if a < b, then it can only go from 0 to 1
+# therefore, ratios are not symmetric around equality (a = b)
+# taking the log of a ratio solves this problem!
+# For example:
+# 4/1 = 4     and  log2(4/1) =  2
+# 1/4 = 0.25  and  log2(1/4) = -2
+
+# Note that another common example where log-transformation should always be used is RT-qPCR data!
+```
+
+
+# Hierarchical clustering
+
+...to do...

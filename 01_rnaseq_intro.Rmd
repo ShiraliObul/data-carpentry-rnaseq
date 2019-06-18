@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
 # Lesson objectives
 
 * Understand the dataset being used
-* Introducing a `matrix` object and how to convert it to a `tibble`
+* Setup an R project, import the data files and do a first exploration of what they are
 
 
 # Summary of dataset
@@ -35,22 +35,22 @@ Very briefly, we have transcriptome data for:
 * Three replicates for each strain at each time point
 
 Let's say that you did this experiment yourself, and that a bioinformatician 
-analysed it and provided you with four things:
+analysed it and provided you with four files of data:
 
-* Information about each sample.
-* 'Raw' read counts for all genes, which gives a measure of the genes' expression. 
+* `sample_info.csv` - information about each sample.
+* `counts_raw.csv` - "raw" read counts for all genes, which gives a measure of the genes' expression. 
 (these are simply scaled to the size of each library to account for the fact that 
 different samples have more or less total number of reads).
-* Normalised read counts for all genes, on a log scale and transformed to correct 
+* `counts_transformed.csv` - normalised read counts for all genes, on a log scale and transformed to correct 
 for a dependency between the mean and variance, which is typical in such count data
-(we will explore this property of the data ourselves).
-* Results from a statistical test that assessed the probability of observed expression differences  
+(we will explore this in the [initial exploratory data analysis lesson](02_rnaseq_exploratory.html)).
+* `test_result.csv` - results from a statistical test that assessed the probability of observed expression differences  
 between the first and each of the other time points in WT cells, assuming a null hypothesis of no difference.
 
 
 # Getting started
 
-The data are provided within an `RData` file, which you can download and read 
+The data are provided as CSV files, which you can download and read 
 into your R session.
 
 First, let's clean our workspace (remove any objects created before), 
@@ -67,15 +67,31 @@ rm(list = ls())
 # Load the tidyverse package
 library(tidyverse)
 
-# Download the data provided by your collaborator
+# Create a "data" directory
 dir.create("data")
-download.file("https://github.com/tavareshugo/data-carpentry-rnaseq/blob/master/data/fission_data.RData?raw=true",
-              destfile = "data/fission_data.RData",
-              mode = "wb")
 
-# Load the data
-load("data/fission_data.RData")
+# Download the data provided by your collaborator
+# using a for loop to automate this step
+for(i in c("counts_raw.csv", "counts_transformed.csv", "sample_info.csv", "test_result.csv")){
+  download.file(
+    url = paste0("https://github.com/tavareshugo/data-carpentry-rnaseq/blob/master/data/", i, "?raw=true"),
+    destfile = i
+  )
+}
 ```
+
+
+----
+
+**Exercise:**
+
+> Import data into R and familiarise yourself with it.
+>
+> Create four objects called `raw_cts`, `trans_cts`, `sample_info` and `test_result`.
+
+[Link to full exercise](exercises.html#11_import_data)
+
+----
 
 ```{r, echo = FALSE, message = FALSE}
 # In the repository data is read from the current directory
@@ -83,57 +99,12 @@ load("data/fission_data.RData")
 library(tidyverse)
 
 # Load the data
-load("data/fission_data.RData")
+raw_cts <- read_csv("./data/counts_raw.csv")
+trans_cts <- read_csv("./data/counts_transformed.csv")
+sample_info <- read_csv("./data/sample_info.csv")
+test_result <- read_csv("./data/test_result.csv")
 ```
 
-----
-
-**Exercise:**
-
-> Familiarise yourself with these data:
->
-> - what kind of objects were you provided with? (hint: `class()`)
-> - How many samples did you have? Is the design balanced?
-> - How many genes do you have gene expression levels for?
-
-----
-
-
-
-### Matrix object
-
-You might have noticed that `norm_cts` is a `matrix` object. We haven't found 
-these before, and to produce visualisations of our data, it is convenient to 
-start by converting our matrix of gene expression to a `tibble` (`data.frame`).
-
-Matrices are a bit similar to `data.frame`, but they only contain values of a 
-single type, in this case numeric values (whereas in a `data.frame` different 
-columns can contain different types of data). 
-
-```{r}
-# Look at the first 10 rows and first 5 samples of norm_cts
-norm_cts[1:10, 1:5]
-```
-
-You will also notice that gene names are contained in the row names of this 
-matrix (they are not a column of their own!). 
-
-To convert this matrix into a `tibble` object we can use the function `as_tibble()`:
-
-```{r}
-# Convert matrix to tibble
-as_tibble(norm_cts)
-```
-
-But now we've lost our gene names! 
-If we look at the function's help (`?as_tibble`), we can see that there's a way 
-to solve this problem:
-
-```{r}
-# Convert matrix to tibble - add colnames to a new column called "gene"
-norm_cts_tbl <- as_tibble(norm_cts, rownames = "gene")
-norm_cts_tbl
-```
 
 ----
 
