@@ -74,7 +74,7 @@ test_result %>%
 > 
 > Why is the fold-change reported on a log-scale?
 
-[Link to exercise](exercises.html#41_ma_plot)
+[Link to exercise](00_exercises.html#41_ma_plot)
 
 ----
 

@@ -89,7 +89,7 @@ for(i in c("counts_raw.csv", "counts_transformed.csv", "sample_info.csv", "test_
 >
 > Create four objects called `raw_cts`, `trans_cts`, `sample_info` and `test_result`.
 
-[Link to full exercise](exercises.html#11_import_data)
+[Link to full exercise](00_exercises.html#11_import_data)
 
 ----
 

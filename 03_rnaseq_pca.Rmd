@@ -107,7 +107,7 @@ sample_pca <- prcomp(pca_matrix)
 
 > Examine the output of the `prcomp()` function.
 
-[Link to exercise](exercises.html#31_examine_prcomp()_output)
+[Link to exercise](00_exercises.html#31_examine_prcomp()_output)
 
 ----
 
@@ -180,7 +180,7 @@ data, suggesting clusters of samples that are more similar to each other.
 
 > Modify the code above to recreate the plot below. Save the plot in an object called `pca_plot`
 
-[Link to exercise](exercises.html#32_annotating_pc_plot)
+[Link to exercise](00_exercises.html#32_annotating_pc_plot)
 
 ```{r, echo=FALSE}
 # The PC scores are stored in the "x" value of the prcomp object, which is a matrix

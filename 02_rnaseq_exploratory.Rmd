@@ -105,7 +105,7 @@ for another example of using these functions)
 
 > Convert the `raw_cts` created above to a "long" format using the `gather()` function
 
-[Link to full exercise](exercises.html#21_gather_table)
+[Link to full exercise](00_exercises.html#21_gather_table)
 
 ----
 
@@ -171,7 +171,7 @@ trans_cts_long %>%
 log-transforming the data).
 > * Try out other ways to visualise these data, for example as a boxplot.
 
-[Link to full exercise](exercises.html#22_join_tables)
+[Link to full exercise](00_exercises.html#22_join_tables)
 
 ----
 
@@ -198,7 +198,7 @@ are biological replicates of the same strain and treatment!
 
 > Compare the expression between a WT cell at T0 and T30. What can you conclude from this?
 
-[Link to full exercise](exercises.html#23_scatterplot)
+[Link to full exercise](00_exercises.html#23_scatterplot)
 
 ----
 
