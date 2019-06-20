@@ -73,9 +73,9 @@ raw_cts_long <- full_join(raw_cts_long, sample_info, by = ("sample"))
 
 # Make the plot
 raw_cts_long %>%
-  ggplot(aes(log10(cts), colour = replicate)) + 
+  # add pseudo-count of 1 because log(0) = -Inf
+  ggplot(aes(log10(cts + 1), colour = replicate)) + 
   geom_freqpoly(binwidth = 1) + 
-  facet_grid(strain ~ minute)
 ```
 
 
@@ -141,7 +141,7 @@ str(sample_pca)
 
 # 4. we can use the 'dollar sign' to access these elements
 pc_scores <- sample_pca$x              # PC scores (a matrix)
-pc_eigenvalues <- sample_pca$sdev^2    # eigenvalues (a vector) - notice that we squared the values
+pc_eigenvalues <- sample_pca$sdev^2    # eigenvalues (a vector) - notice we square the values
 pc_loadings <- sample_pca$rotation     # variable loadings (a matrix)
 
 # 5. here's three ways to check this
@@ -215,7 +215,3 @@ Why is the fold-change log transformed?
 # Note that another common example where log-transformation should always be used is RT-qPCR data!
 ```
 
-
-# Hierarchical clustering
-
-...to do...

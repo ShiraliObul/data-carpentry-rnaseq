@@ -11,14 +11,14 @@ These lessons are under active development and may change over time.
 The lessons are modular so can be taught in different order than shown here 
 (apart from the introduction, which should always be the first):
 
-* [Introduction](01_rnaseq_intro.html) to the dataset
+* [Introduction](01_rnaseq_intro.html) to the dataset.
 * [Basic exploratory analysis](02_rnaseq_exploratory.html)
 to understand some properties of expression data.
 * [Using principal component analysis (PCA)](03_rnaseq_pca.html)
 to explore transcriptome-wide effects of our experimental design.
 * Exploring gene expression patterns:
-    * [Identifying candidate genes](04_explore_test_results.html) from a differential analysis test.
-    * [Using clustering](05_rnaseq_clustering.html) to partition genes into groups.
+    * [Identifying candidate genes](04a_explore_test_results.html) from a differential analysis test.
+    * [Using clustering](04b_rnaseq_clustering.html) to partition genes into groups.
 
 
 ### Important note

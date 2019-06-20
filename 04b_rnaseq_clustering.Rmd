@@ -21,22 +21,35 @@ knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
 * Apply hierarchical clustering in R using `hclust()`
 
 
-```{r, echo = FALSE, message = FALSE}
-# Load the tidyverse package
-library(tidyverse)
+#### Further resources
 
-# Load the data
-raw_cts <- read_csv("./data/counts_raw.csv")
-trans_cts <- read_csv("./data/counts_transformed.csv")
-sample_info <- read_csv("./data/sample_info.csv")
-test_result <- read_csv("./data/test_result.csv")
-```
+* Short article about clustering using transcriptome data:
+    * Naomi Altman & Martin Krzywinski (2017) [Clustering](https://www.nature.com/articles/nmeth.4299), Nature Methods 14, 545–546
+* StatQuest video by Josh Starmer (watch all of them!): 
+    * [Hierarchical Clustering](https://youtu.be/7xHsRkOdVwo)
+* Book chapter from Roger Peng's _Exploratory Data Analysis with R_:
+    * [Hierarchical Clustering](https://bookdown.org/rdpeng/exdata/hierarchical-clustering.html)
 
 
-Make sure you go through the [previous lesson](04_explore_test_results.html) 
+# Setup
+
+Make sure you go through the [previous lesson](04a_explore_test_results.html) 
 first, or run the following code:
 
 ```{r}
+##### setup ####
+
+# load packages
+library(tidyverse)
+
+# read the data
+trans_cts <- read_csv("./data/counts_transformed.csv")
+sample_info <- read_csv("./data/sample_info.csv")
+test_result <- read_csv("./data/test_result.csv")
+
+
+##### get counts for candidate genes ####
+
 # set of candidate genes for clustering
 candidate_genes <- test_result %>% 
   filter(padj < 0.01) %>%    # filter table
@@ -76,11 +89,6 @@ Another method that is commonly used is _k-means_, which we won't cover here.
 The idea with these clustering methods, is that they can help us interpret 
 high dimensional data. In our case, we aim to understand what gene expression 
 patterns we have across time in the two mutant strains.
-
-See this article for a nice introduction to this topic, which also uses transcriptome 
-data: 
-Naomi Altman & Martin Krzywinski (2017) [Clustering](https://www.nature.com/articles/nmeth.4299),
-Nature Methods 14, 545–546
 
 
 # Gene partitioning using hierarchical clustering
@@ -173,13 +181,14 @@ the dendrogram, cutting it into different groups (e.g. the brown line shown abov
 We can use the `cutree()` function do this dendrogram "cutting". 
 For example, if you want to cut it into 5 groups, you would simply do:
 
+```{r, eval = FALSE}
+cutree(gene_hclust, k = 5)
+```
+
 ```{r, echo=FALSE}
 cutree(gene_hclust, k = 5)[1:10]
 ```
 
-```{r, eval = FALSE}
-cutree(gene_hclust, k = 5)
-```
 
 The output of `cutree()` is a named vector, where each gene is assigned to a cluster 
 number (the numbers are somewhat arbitrary, but genes with the same number belong 
@@ -206,7 +215,7 @@ Finally, we are ready to visualise our gene expression trends, but separate our
 genes into their respective clusters. 
 
 First, let's join our table with gene clusters to the table of gene summarised 
-counts that we produced in the [previous lesson](04_explore_test_results.html):
+counts that we produced in the [previous lesson](04a_explore_test_results.html):
 
 ```{r}
 trans_cts_cluster <- trans_cts_mean %>% 
@@ -255,12 +264,12 @@ Often, gene expression patterns are represented as heatmaps. These can be easily
 created using specialised functions that do the clustering and create the heatmap
 for you.
 
-One package that provides many adanced features is the R/Bioconductor  
+One package that provides many adanced features is the R/Bioconductor 
 [`ComplexHeatmap`](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html). 
 
 It's basic usage is:
 
-```{r}
+```{r, message=FALSE}
 library(ComplexHeatmap)
 Heatmap(hclust_matrix, show_row_names = FALSE)
 ```

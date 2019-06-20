@@ -20,12 +20,19 @@ knitr::opts_chunk$set(echo = TRUE)
 gene expression tests
 * Understand how scaling data can help in visualising gene expression trends
 
-```{r, echo = FALSE, message = FALSE}
-# Load the tidyverse package
+
+# Setup
+
+In your project's directory, create a new script called `04_gene_clustering.R`, 
+and start with the following code:
+
+```{r, message = FALSE}
+##### setup ####
+
+# load packages
 library(tidyverse)
 
-# Load the data
-raw_cts <- read_csv("./data/counts_raw.csv")
+# read the data
 trans_cts <- read_csv("./data/counts_transformed.csv")
 sample_info <- read_csv("./data/sample_info.csv")
 test_result <- read_csv("./data/test_result.csv")
@@ -42,7 +49,7 @@ We were given a table with the results of a differential analysis test between
 0 min and each of the other time-points:
 
 ```{r, echo = FALSE}
-head(test_result)
+test_result
 ```
 
 
@@ -74,7 +81,7 @@ test_result %>%
 > 
 > Why is the fold-change reported on a log-scale?
 
-[Link to exercise](00_exercises.html#41_ma_plot)
+[Link to full exercise](00_exercises.html#41_ma_plot)
 
 ----
 
@@ -197,7 +204,8 @@ trans_cts_mean %>%
 As you see, this is a substantially clearer picture than before, we can clearly 
 see some patterns there. It's not perfect yet: as you can see there are different 
 "populations" of genes with different trends. 
-In the [clustering lesson](05_rnaseq_clustering.html) we will see how we can partition 
-the genes into different categories and separate them out.
+In the [clustering lesson](04b_rnaseq_clustering.html) we will see how we can partition 
+the genes into different categories and separate them out so we don't have this 
+terrible [spaghetti plot](https://www.data-to-viz.com/caveat/spaghetti.html).
 
 

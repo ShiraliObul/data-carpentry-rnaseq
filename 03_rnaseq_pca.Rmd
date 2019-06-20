@@ -21,16 +21,33 @@ knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
 * Apply PCA using R's `prcomp()` function and understand the structure of the resulting object
 * Use PCA to derive information about structure in multi-dimensional datasets such as RNAseq
 
+
+#### Further resources
+
+* Short article about PCA using transcriptome data:
+    * Jake Lever, Martin Krzywinski & Naomi Altman (2017) [Principal component analysis](https://www.nature.com/articles/nmeth.4346),
+Nature Methods 14, 641–642
+* StatQuest videos by Josh Starmer (watch all of them!): 
+    * [Principal Component Analysis (PCA), Step-by-Step](https://youtu.be/FgakZw6K1QQ)
+    * [PCA - Practical Tips](https://youtu.be/oRvgq966yZg)
+* Book chapter from Roger Peng's _Exploratory Data Analysis with R_:
+    * [Dimension Reduction](https://bookdown.org/rdpeng/exdata/dimension-reduction.html)
+
+
+# Setup
+
+In your project's directory, create a new script called `03_pca_samples.R`, 
+and start with the following code:
+
 ```{r, echo = FALSE, message = FALSE}
-# In the repository data is read from the current directory
-# Load the tidyverse package
+##### setup ####
+
+# load packages
 library(tidyverse)
 
-# Load the data
-raw_cts <- read_csv("./data/counts_raw.csv")
+# read the data
 trans_cts <- read_csv("./data/counts_transformed.csv")
 sample_info <- read_csv("./data/sample_info.csv")
-test_result <- read_csv("./data/test_result.csv")
 ```
 
 
@@ -55,22 +72,12 @@ examine projections to the first two (or few) PCs.
 
 There are three basic types of information we obtain from a PCA:
 
-* PC scores - these are the coordinates of our samples on the new PC axis
-* Eigenvalues - these represent the variance explained by each PC. 
+* *PC scores* - these are the coordinates of our samples on the new PC axis
+* *Eigenvalues* - these represent the variance explained by each PC. 
 We can use these to calculate the proportion of variance in the original data 
 that each axis explains.
-* Variable loadings (eigenvectors) - these reflect the "weight" that each variable has on a particular 
+* *Variable loadings* (eigenvectors) - these reflect the "weight" that each variable has on a particular 
 PC. These can be thought of as the correlation between the PC and the original variable.
-
-See this article for a nice introduction to this topic, which also uses transcriptome 
-data: 
-Jake Lever, Martin Krzywinski & Naomi Altman (2017) [Principal component analysis](https://www.nature.com/articles/nmeth.4346),
-Nature Methods 14, 641–642
-
-Also see these two videos from StatQuest, by Josh Starmer (or just watch all of them!): 
-
-* [Principal Component Analysis (PCA), Step-by-Step](https://youtu.be/FgakZw6K1QQ)
-* [PCA - Practical Tips](https://youtu.be/oRvgq966yZg)
 
 
 # Running PCA using `prcomp()`
@@ -107,7 +114,7 @@ sample_pca <- prcomp(pca_matrix)
 
 > Examine the output of the `prcomp()` function.
 
-[Link to exercise](00_exercises.html#31_examine_prcomp()_output)
+[Link to full exercise](00_exercises.html#31_examine_prcomp()_output)
 
 ----
 
@@ -180,7 +187,7 @@ data, suggesting clusters of samples that are more similar to each other.
 
 > Modify the code above to recreate the plot below. Save the plot in an object called `pca_plot`
 
-[Link to exercise](00_exercises.html#32_annotating_pc_plot)
+[Link to full exercise](00_exercises.html#32_annotating_pc_plot)
 
 ```{r, echo=FALSE}
 # The PC scores are stored in the "x" value of the prcomp object, which is a matrix
@@ -207,7 +214,8 @@ be distinguishable if we explore other PC axis!).
 it doesn't mean that no genes differ between the genotypes, just that they don't 
 explain most of the variance captured by PC1 and PC2)
 
-**Important note:**
+
+#### Important note
 
 Often it is a good idea to _standardize_ the variables before doing the PCA. 
 This is often done by _centering_ the data on the mean and then _scaling_ it by 
@@ -222,7 +230,7 @@ Note that _scaling_ is particularly recommended if your variables are on differe
 scales.
 
 We talk more about standardizing gene expression data in the 
-[gene clustering lesson](04_rnaseq_clustering.html).
+[gene clustering lesson](05_rnaseq_clustering.html).
 
 
 ### Variance explained by PCs
@@ -242,7 +250,7 @@ library(broom)
 tidy(sample_pca, matrix = "pcs")
 ```
 
-This table can be easily used to produce a _Scree Plot_, which shows the fraction 
+This table can easily be used to produce a _Scree Plot_, which shows the fraction 
 of total variance explained by each principal component. We will show both the 
 variance explained by individual PCs as well as the cumulative variance, using a 
 type of visualisation known as a [pareto chart](https://en.wikipedia.org/wiki/Pareto_chart):
@@ -251,7 +259,8 @@ type of visualisation known as a [pareto chart](https://en.wikipedia.org/wiki/Pa
 tidy(sample_pca, matrix = "pcs") %>% 
   ggplot(aes(x = factor(PC))) +
   geom_col(aes(y = percent)) +
-  geom_line(aes(y = cumulative, group = 1)) + geom_point(aes(y = cumulative)) +
+  geom_line(aes(y = cumulative, group = 1)) + 
+  geom_point(aes(y = cumulative)) +
   labs(x = "Principal component", y = "Fraction variance explained")
 ```
 
@@ -282,19 +291,21 @@ format:
 
 ```{r}
 # variable loadings (eigen vectors) for genes that were used as variables in PCA
-tidy(sample_pca, matrix = "pcs")
+tidy(sample_pca, matrix = "variables")
 ```
 
 From these data, we can extract the genes with the highest eigenvalues along PC1 
-and PC2 using some `dplyr`. 
+and PC2 using some `dplyr` tricks. 
 
 ```{r}
-top_genes <- tidy(sample_pca, matrix = "variables") %>%  
+top_genes <- sample_pca %>% 
+  # extract variable (gene) loadings
+  tidy(matrix = "variables") %>%  
   # retain only PC1 and PC2
   filter(PC %in% c(1, 2)) %>%
   # for each PC
   group_by(PC) %>%
-  # sort table by descending value
+  # sort descending value
   arrange(desc(abs(value))) %>%
   # take top 5 rows of each PC group
   slice(1:5) %>%
@@ -314,7 +325,7 @@ gene_loadings <- sample_pca$rotation %>%
   filter(gene %in% top_genes)
 ```
 
-We can use this to draw vectors of each gene's loading projected onto each PC:
+We can use this to plot the loadings of each gene along PC1 and PC2:
 
 ```{r}
 loadings_plot <- ggplot(gene_loadings) +
@@ -332,16 +343,19 @@ loadings_plot
 Using the `patchwork` package, we put these two plots side by side to get a 
 more complete and interpretable view of our PCA analysis:
 
-```{r}
+```{r, fig.width=8, fig.height=3}
 library(patchwork)
-pca_plot + labs(tag = "A", title = "PC scores") +
-  loadings_plot + labs(tag = "B", title = "PC loadings") +
+pca_plot + coord_fixed(ratio = 0.4) + labs(tag = "A", title = "PC scores") +
+  loadings_plot + coord_fixed(ratio = 0.4) + labs(tag = "B", title = "PC loadings") +
   plot_layout(ncol = 2)
 ```
 
+Notice how we've forced our PC1 axis to be around twice as long as the PC2 
+axis. This is because the variance explained by PC1 is about twice 
+as large as the variance explained by PC2.
 
 
-## Shortcut for a quick visualisation
+### Quick visualisation shortcut
 
 This was all very useful to understand how PCA works and how to fully explore 
 its results. However, it can sometimes be convenient to produce these graphs 
@@ -366,7 +380,8 @@ autoplot(sample_pca, data = sample_info, colour = "minute", shape = "strain")
 
 Finally, you _could_ easily add information about loadings to the plot by adding the 
 options `loadings = TRUE, loadings.label = TRUE`. But don't do it, because we 
-have thousands of genes, so the plot would be un-interpretable!
+have thousands of genes, so the plot would be un-interpretable (and probably 
+crash your computer)!
 
 ```{r, eval=FALSE}
 # Example using iris dataset

@@ -1,5 +1,5 @@
 ---
-title: "Exploratory analysis of RNAseq data"
+title: "Exploratory analysis of RNAseq count data"
 output:
   html_document:
     toc: yes
@@ -25,13 +25,26 @@ knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
 * Reformat data from wide to long format (and vice-versa)
 * Join tables
 
+#### Further resources
 
-```{r, echo = FALSE, message = FALSE}
-# In the repository data is read from the current directory
-# Load the tidyverse package
+* Article giving an overview of best practices for RNAseq analysis:
+    * Conesa et al. (2016) [A survey of best practices for RNA-seq data analysis](https://doi.org/10.1186/s13059-016-0881-8), Genome Biology 17, 13
+* Book chapter from Susan Holmes & Wolfgang Huber's _Modern Statistics for Modern Biology_:
+    * [High-Throughput Count Data](https://www.huber.embl.de/msmb/Chap-CountData.html)
+
+
+# Setup
+
+In your project's directory, create a new script called `02_eda_count_data.R`
+("eda" stands for "Exploratory Data Analysis"), and start with the following code:
+
+```{r, message = FALSE}
+##### setup ####
+
+# load packages
 library(tidyverse)
 
-# Load the data
+# read the data
 raw_cts <- read_csv("./data/counts_raw.csv")
 trans_cts <- read_csv("./data/counts_transformed.csv")
 sample_info <- read_csv("./data/sample_info.csv")
@@ -96,7 +109,7 @@ trans_cts_long %>%
   spread(sample, cts)
 ```
 
-(see [here](http://www.datacarpentry.org/R-ecology-lesson/03-dplyr.html#reshaping_with_gather_and_spread)
+(revisit the [Data Carpentry lesson](http://www.datacarpentry.org/R-ecology-lesson/03-dplyr.html#reshaping_with_gather_and_spread)
 for another example of using these functions)
 
 ----
@@ -215,10 +228,11 @@ between every pair of samples. We can use the `cor()` function to do this, and
 give it our table of gene counts:
 
 ```{r}
-# Calculate all correlations using Spearman's method
+# Calculate all correlations 
 trans_cts_corr <- trans_cts %>% 
   # remove the column "gene", which we do not want to calculate correlation on
   select(-gene) %>% 
+  # we use Spearman's correlation, a non-parametric metric based on ranks
   cor(method = "spearman")
 
 # Visualise the correlations between the first 5 samples
@@ -227,7 +241,7 @@ trans_cts_corr[1:5, 1:5]
 
 Now, we can use the `corrplot` package to help us visualise this:
 
-```{r}
+```{r, message=FALSE}
 library(corrplot)
 
 corrplot(trans_cts_corr, 
@@ -248,7 +262,7 @@ Make sure that you have a "tidy" version of these raw normalised counts:
 ```{r}
 raw_cts_long <- raw_cts %>% 
   gather("sample", "cts", -gene) %>% 
-  full_join(sample_info)
+  full_join(sample_info, by = "sample")
 ```
 
 The summary function is quite handy here as a first approach to exploring differences 
@@ -289,11 +303,14 @@ for low values) than the normalised data. Let's examine the relationship between
 mean and variance of each gene across all samples:
 
 ```{r}
-# Summarise the data per gene, calculating mean and variance
+# Summarise the data and then plot
 raw_cts_long %>% 
+  # for each gene
   group_by(gene) %>% 
+  # get mean and variance
   summarise(mean_cts = mean(cts),
             var_cts = var(cts)) %>% 
+  # plot one against the other
   ggplot(aes(mean_cts, var_cts)) +
   geom_point() +
   geom_abline(colour = "brown") +
