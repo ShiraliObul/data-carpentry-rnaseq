@@ -383,7 +383,7 @@ between the first and each of the other time points in WT cells, assuming a null
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="st">&quot;counts_raw.csv&quot;</span>, <span class="st">&quot;counts_transformed.csv&quot;</span>, <span class="st">&quot;sample_info.csv&quot;</span>, <span class="st">&quot;test_result.csv&quot;</span>)){
   <span class="kw">download.file</span>(
     <span class="dt">url =</span> <span class="kw">paste0</span>(<span class="st">&quot;https://github.com/tavareshugo/data-carpentry-rnaseq/blob/master/data/&quot;</span>, i, <span class="st">&quot;?raw=true&quot;</span>),
-    <span class="dt">destfile =</span> i
+    <span class="dt">destfile =</span> <span class="kw">paste0</span>(<span class="st">&quot;data/&quot;</span>, i)
   )
 }</code></pre></div>
 <p>Finally, load the <code>tidyverse</code> package and do the excercises below:</p>
