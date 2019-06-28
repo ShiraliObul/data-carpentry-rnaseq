@@ -39,7 +39,7 @@ Nature Methods 14, 641–642
 In your project's directory, create a new script called `03_pca_samples.R`, 
 and start with the following code:
 
-```{r, echo = FALSE, message = FALSE}
+```{r, message = FALSE}
 ##### setup ####
 
 # load packages

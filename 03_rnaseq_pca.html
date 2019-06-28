@@ -370,6 +370,14 @@ div.tocify {
 <div id="setup" class="section level1">
 <h1>Setup</h1>
 <p>In your project’s directory, create a new script called <code>03_pca_samples.R</code>, and start with the following code:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##### setup ####
+
+<span class="co"># load packages</span>
+<span class="kw">library</span>(tidyverse)
+
+<span class="co"># read the data</span>
+trans_cts &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;./data/counts_transformed.csv&quot;</span>)
+sample_info &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;./data/sample_info.csv&quot;</span>)</code></pre></div>
 </div>
 <div id="pca-basics" class="section level1">
 <h1>PCA basics</h1>
