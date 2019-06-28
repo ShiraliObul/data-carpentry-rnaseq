@@ -74,9 +74,9 @@ for(i in c("counts_raw.csv", "counts_transformed.csv", "sample_info.csv", "test_
 ```
 
 
-Finally, load the `tidyverse` package and do the excercises below:
+Finally, load the `tidyverse` package and do the exercises below:
 
-```{r}
+```{r, message=FALSE}
 # load the package
 library(tidyverse)
 ```

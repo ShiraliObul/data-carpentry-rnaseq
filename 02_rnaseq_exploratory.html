@@ -490,7 +490,7 @@ trans_cts_long</code></pre></div>
 <p>Look at the “Combine Data Sets” section of the <a href="https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf">dplyr cheatsheet</a> to understand them better.</p>
 <p>In our case, we know that all samples in our counts table also occur in the <code>sample_info</code> table, so there’s a few different kinds of joins that would work.</p>
 <p>For safety, let’s use <code>full_join()</code>, to ensure we retain all data from both tables:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trans_cts_long &lt;-<span class="st"> </span><span class="kw">full_join</span>(trans_cts_long, sample_info, <span class="dt">by =</span> (<span class="st">&quot;sample&quot;</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trans_cts_long &lt;-<span class="st"> </span><span class="kw">full_join</span>(trans_cts_long, sample_info, <span class="dt">by =</span> <span class="st">&quot;sample&quot;</span>)
 
 trans_cts_long</code></pre></div>
 <pre><code>## # A tibble: 216,396 x 6

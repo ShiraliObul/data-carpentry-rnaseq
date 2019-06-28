@@ -230,7 +230,7 @@ Note that _scaling_ is particularly recommended if your variables are on differe
 scales.
 
 We talk more about standardizing gene expression data in the 
-[gene clustering lesson](05_rnaseq_clustering.html).
+[gene clustering lesson](04b_rnaseq_clustering.html).
 
 
 ### Variance explained by PCs

@@ -156,7 +156,7 @@ table, so there's a few different kinds of joins that would work.
 For safety, let's use `full_join()`, to ensure we retain all data from both tables:
 
 ```{r}
-trans_cts_long <- full_join(trans_cts_long, sample_info, by = ("sample"))
+trans_cts_long <- full_join(trans_cts_long, sample_info, by = "sample")
 
 trans_cts_long
 ```

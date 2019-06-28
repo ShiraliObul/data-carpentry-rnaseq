@@ -470,7 +470,7 @@ pc_scores <span class="op">%&gt;%</span><span class="st"> </span>
 <h4>Important note</h4>
 <p>Often it is a good idea to <em>standardize</em> the variables before doing the PCA. This is often done by <em>centering</em> the data on the mean and then <em>scaling</em> it by dividing by the standard deviation. This ensures that the PCA is not too influenced by genes with higher absolute expression. By default, the <code>prcomp()</code> function does the centering but not the scaling. See the <code>?prcomp</code> help to see how to change this default behaviour. In this case, because we are using the transformed data, this is not too much of an issue, but try re-running the PCA with the <em>centered</em> and <em>scaled</em> data to see how it changes it.</p>
 <p>Note that <em>scaling</em> is particularly recommended if your variables are on different scales.</p>
-<p>We talk more about standardizing gene expression data in the <a href="05_rnaseq_clustering.html">gene clustering lesson</a>.</p>
+<p>We talk more about standardizing gene expression data in the <a href="04b_rnaseq_clustering.html">gene clustering lesson</a>.</p>
 </div>
 </div>
 <div id="variance-explained-by-pcs" class="section level3">

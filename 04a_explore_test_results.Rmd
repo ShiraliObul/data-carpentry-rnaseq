@@ -85,9 +85,6 @@ test_result %>%
 
 ----
 
-From the coloured clouds of points, we can see that more genes seem to 
-markedly increase than decrease their expression in relation to T0.
-
 The plot above is in agreement with our [PCA analysis](03_rnaseq_pca.html), 
 which showed that cells from T30 were overall transcriptomically quite distinct 
 from T0 cells.
