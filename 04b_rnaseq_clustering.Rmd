@@ -36,7 +36,7 @@ knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
 Make sure you go through the [previous lesson](04a_explore_test_results.html) 
 first, or run the following code:
 
-```{r}
+```{r, message=FALSE}
 ##### setup ####
 
 # load packages
