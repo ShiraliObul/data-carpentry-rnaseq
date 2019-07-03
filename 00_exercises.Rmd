@@ -31,7 +31,7 @@ load("data/fission_data.RData")
 
 1. Import the four CSV files into R and store in the following objects: 
 `raw_cts`, `trans_cts`, `sample_info` and `test_result`.
-2. How many samples did you have? 
+2. How many samples are there? 
 Was the design balanced (i.e. do all samples have the same number of replicates)?
 3. How many genes do you have gene expression levels for?
 
@@ -153,9 +153,8 @@ ncol(pc_loadings)
 ## Annotating PC plot
 
 Try to recreate the plot below. 
-You will need to _join_ the information about each sample and _colour_ 
-the points according to "minute" and their _shape_ according to "strain".
-
+You will first need to _join_ your `pc_scores` table with the `sample_info` table.
+Then, _colour_ the points according to "minute" and their _shape_ according to "strain".
 
 ```{r}
 pc_scores %>% 
@@ -174,18 +173,33 @@ pc_scores %>%
 
 ## MA plot
 
-Recreate the plot below from the `test_result` table. (hint: notice the x-axis is log-transformed)
+1. Recreate the plot below from the `test_result` table. (hint: notice the x-axis is log-transformed)
+2. Why is the fold-change log transformed? 
+
 
 ```{r}
+# 1. making the MA plot
 test_result %>% 
   ggplot(aes(log10(baseMean), log2FoldChange)) +
   geom_point(alpha = 0.1) +
   facet_wrap( ~ comparison)
+
+# 2. The reason fold change is log-transformed is:
+# Because a fold-change (FC) is a ratio between two things FC = a/b
+# if a > b, then the FC can vary from 1 to infinity!
+# but if a < b, then it can only go from 0 to 1
+# therefore, ratios are not symmetric around equality (a = b)
+# taking the log of a ratio solves this problem!
+# For example:
+# 4/1 = 4     and  log2(4/1) =  2
+# 1/4 = 0.25  and  log2(1/4) = -2
+# Note that another common example where log-transformation should always be used is RT-qPCR data!
 ```
 
 **Bonus:** try and re-create the plot below where the x-axis is on a log-scale but 
 showing the original units and genes with an adjusted p-value below 0.01 are highlighted 
-in red.
+in red. (hint: the function `ifelse()` is useful here. This may be hard if you're new 
+with R: but look at the solution and see if you can understand the trick we're using.)
 
 ```{r, warning=FALSE}
 test_result %>% 
@@ -199,19 +213,4 @@ test_result %>%
   facet_wrap( ~ comparison)
 ```
 
-
-Why is the fold-change log transformed? 
-
-```{r}
-# Because a fold-change (FC) is a ratio between two things FC = a/b
-# if a > b, then the FC can vary from 1 to infinity!
-# but if a < b, then it can only go from 0 to 1
-# therefore, ratios are not symmetric around equality (a = b)
-# taking the log of a ratio solves this problem!
-# For example:
-# 4/1 = 4     and  log2(4/1) =  2
-# 1/4 = 0.25  and  log2(1/4) = -2
-
-# Note that another common example where log-transformation should always be used is RT-qPCR data!
-```
 
