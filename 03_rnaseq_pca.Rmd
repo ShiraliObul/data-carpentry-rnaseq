@@ -30,8 +30,8 @@ Nature Methods 14, 641–642
 * StatQuest videos by Josh Starmer (watch all of them!): 
     * [Principal Component Analysis (PCA), Step-by-Step](https://youtu.be/FgakZw6K1QQ)
     * [PCA - Practical Tips](https://youtu.be/oRvgq966yZg)
-* Book chapter from Roger Peng's _Exploratory Data Analysis with R_:
-    * [Dimension Reduction](https://bookdown.org/rdpeng/exdata/dimension-reduction.html)
+* Book chapter from Holmes & Huber _Modern Statistics for Modern Biology_:
+    * [Multivariate Analysis](https://www.huber.embl.de/msmb/Chap-Multivariate.html)
 
 
 # Setup

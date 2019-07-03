@@ -20,6 +20,11 @@ knitr::opts_chunk$set(echo = TRUE)
 gene expression tests
 * Understand how scaling data can help in visualising gene expression trends
 
+#### Further resources
+
+* Book chapter from Holmes & Huber _Modern Statistics for Modern Biology_:
+    * [High-Throughput Count Data](https://www.huber.embl.de/msmb/Chap-CountData.html)
+
 
 # Setup
 

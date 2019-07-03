@@ -27,8 +27,8 @@ knitr::opts_chunk$set(echo = TRUE, rows.print = 10)
     * Naomi Altman & Martin Krzywinski (2017) [Clustering](https://www.nature.com/articles/nmeth.4299), Nature Methods 14, 545–546
 * StatQuest video by Josh Starmer (watch all of them!): 
     * [Hierarchical Clustering](https://youtu.be/7xHsRkOdVwo)
-* Book chapter from Roger Peng's _Exploratory Data Analysis with R_:
-    * [Hierarchical Clustering](https://bookdown.org/rdpeng/exdata/hierarchical-clustering.html)
+* Book chapter from Holmes & Huber _Modern Statistics for Modern Biology_:
+    * [Clustering](https://www.huber.embl.de/msmb/Chap-Clustering.html)
 
 
 # Setup
