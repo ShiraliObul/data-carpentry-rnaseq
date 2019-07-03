@@ -75,7 +75,7 @@ raw_cts_long <- full_join(raw_cts_long, sample_info, by = ("sample"))
 raw_cts_long %>%
   # add pseudo-count of 1 because log(0) = -Inf
   ggplot(aes(log10(cts + 1), colour = replicate)) + 
-  geom_freqpoly(binwidth = 1) + 
+  geom_freqpoly(binwidth = 1)
 ```
 
 
@@ -85,7 +85,7 @@ raw_cts_long %>%
 # Make a boxplot
 raw_cts_long %>%
   # make sure minute is specified as a factor
-  ggplot(aes(factor(minute), log10(cts), colour = strain)) + 
+  ggplot(aes(factor(minute), log10(cts + 1), colour = strain)) + 
   geom_boxplot() + 
   facet_grid(. ~ replicate)
 ```
