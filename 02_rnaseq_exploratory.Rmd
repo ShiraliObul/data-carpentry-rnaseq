@@ -60,7 +60,7 @@ distributed in each sample. We could do this, for example, using frequency polyg
 
 ```{r, echo=FALSE}
 trans_cts %>%
-  gather("sample", "cts", -gene) %>% 
+  pivot_longer(-gene, names_to = "sample", values_to = "cts") %>% 
   left_join(sample_info, by = "sample") %>% 
   ggplot(aes(cts, colour = replicate)) + 
   geom_freqpoly(binwidth = 1) + 
@@ -78,53 +78,51 @@ columns: `gene`, `sample`, `cts`, rather than one column per sample
 ### Reshaping data to "long" format
 
 There's two functions that allow us to convert tables from a "wide" to a "long" 
-format and vice-versa: `gather()` and `spread()`.
+format and vice-versa: `pivot_longer()` and `pivot_wider()`.
 
-![](http://www.datacarpentry.org/R-ecology-lesson/img/spread_data_R.png)
+![](figs/tidyr_pivot.png)
 
-![](http://www.datacarpentry.org/R-ecology-lesson/img/gather_data_R.png)
-
-If you notice, what we want in our case is to `gather` our gene expression 
-columns. We can do this by giving `gather()` four things:
+What we want in our case is to go from a "wide" to "long" table, so we use 
+`pivot_longer()`, which needs four things:
 
 * The data, i.e. our table of gene expression
-* A name for the new column that will contain the old column names (the "key" column)
-* A name for the new column that will contain our expression counts (the "values" column)
 * The names of the columns that we want to gather in this way
+* A name for the new column that will contain the old column names (the "names_to" column)
+* A name for the new column that will contain our expression counts (the "values_to" column)
+
 
 Like so:
 
 ```{r}
 # "gather" the counts data
 trans_cts_long <- trans_cts %>% 
-  gather("sample", "cts", wt_0_r1:mut_180_r3)
+  pivot_longer(cols = wt_0_r1:mut_180_r3, 
+               names_to = "sample", 
+               values_to = "cts")
 
 trans_cts_long
 ```
 
-If we wanted to do the reverse, we could use the `spread()` function:
+If we wanted to do the reverse, we could use the `pivot_wider()` function:
 
 ```{r}
 trans_cts_long %>% 
-  spread(sample, cts)
+  pivot_wider(names_from = "sample", values_from = "cts")
 ```
-
-(revisit the [Data Carpentry lesson](http://www.datacarpentry.org/R-ecology-lesson/03-dplyr.html#reshaping_with_gather_and_spread)
-for another example of using these functions)
 
 ----
 
 **Exercise:**
 
-> Convert the `raw_cts` created above to a "long" format using the `gather()` function
+> Convert the `raw_cts` created above to a "long" format using the `pivot_longer()` function
 
-[Link to full exercise](00_exercises.html#21_gather_table)
+[Link to full exercise](00_exercises.html#21_reshape_table)
 
 ----
 
 ```{r, echo=FALSE}
 raw_cts_long <- raw_cts %>% 
-  gather("sample", "cts", wt_0_r1:mut_180_r3)
+  pivot_longer(wt_0_r1:mut_180_r3, names_to = "sample", values_to = "cts")
 ```
 
 
@@ -261,7 +259,7 @@ Make sure that you have a "tidy" version of these raw normalised counts:
 
 ```{r}
 raw_cts_long <- raw_cts %>% 
-  gather("sample", "cts", -gene) %>% 
+  pivot_longer(-gene, names_to = "sample", values_to = "cts") %>% 
   full_join(sample_info, by = "sample")
 ```
 

@@ -52,14 +52,14 @@ nrow(trans_cts)
 
 # Exploratory analysis of count data
 
-## Gather table
+## Reshape table
 
-Convert the `raw_cts` table to a "long" format using the `gather()` function.
+Convert the `raw_cts` table to a "long" format using the `pivot_longer()` function.
 Save it into an object called `raw_cts_long`.
 
 ```{r}
 raw_cts_long <- raw_cts %>% 
-  gather("sample", "cts", wt_0_r1:mut_180_r3)
+  pivot_longer(wt_0_r1:mut_180_r3, names_to = "sample", values_to = "cts")
 ```
 
 ## Join tables

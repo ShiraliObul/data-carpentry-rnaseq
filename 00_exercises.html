@@ -346,11 +346,11 @@ test_result &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span
 </div>
 <div id="exploratory-analysis-of-count-data" class="section level1">
 <h1><span class="header-section-number">2</span> Exploratory analysis of count data</h1>
-<div id="gather-table" class="section level2">
-<h2><span class="header-section-number">2.1</span> Gather table</h2>
-<p>Convert the <code>raw_cts</code> table to a “long” format using the <code>gather()</code> function. Save it into an object called <code>raw_cts_long</code>.</p>
+<div id="reshape-table" class="section level2">
+<h2><span class="header-section-number">2.1</span> Reshape table</h2>
+<p>Convert the <code>raw_cts</code> table to a “long” format using the <code>pivot_longer()</code> function. Save it into an object called <code>raw_cts_long</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">raw_cts_long &lt;-<span class="st"> </span>raw_cts <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">gather</span>(<span class="st">&quot;sample&quot;</span>, <span class="st">&quot;cts&quot;</span>, wt_0_r1<span class="op">:</span>mut_180_r3)</code></pre></div>
+<span class="st">  </span><span class="kw">pivot_longer</span>(wt_0_r1<span class="op">:</span>mut_180_r3, <span class="dt">names_to =</span> <span class="st">&quot;sample&quot;</span>, <span class="dt">values_to =</span> <span class="st">&quot;cts&quot;</span>)</code></pre></div>
 </div>
 <div id="join-tables" class="section level2">
 <h2><span class="header-section-number">2.2</span> Join tables</h2>
