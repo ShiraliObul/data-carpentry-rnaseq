@@ -109,8 +109,8 @@ trans_cts %>%
 
 ## Examine `prcomp()` output
 
-```{r}
-sample_pca <- prcomp(t(trans_cts[, -1]))
+```{r, echo=FALSE}
+sample_pca <- prcomp(t(trans_cts[, -1]), scale = TRUE)
 ```
 
 
