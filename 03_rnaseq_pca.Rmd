@@ -105,27 +105,8 @@ rownames(pca_matrix) <- trans_cts$gene
 pca_matrix <- t(pca_matrix)
 
 # Perform the PCA
-sample_pca <- prcomp(pca_matrix, scale = TRUE)
+sample_pca <- prcomp(pca_matrix)
 ```
-
-
-#### Important note
-
-Often it is a good idea to _standardize_ the variables before doing the PCA. 
-This is often done by _centering_ the data on the mean and then _scaling_ it by 
-dividing by the standard deviation. This ensures that the PCA is not too influenced 
-by genes with higher absolute expression. By default, the `prcomp()` function 
-does the centering but not the scaling. In the code above, we changed this 
-default behaviour to ensure gene expression data was scaled. 
-In this case, because we are using the transformed data, this is not too much 
-of an issue, but try re-running the PCA with the default options to see how it changes it. 
-
-Note that _scaling_ is particularly recommended if your variables are on different 
-scales.
-
-We talk more about standardizing gene expression data in the 
-[gene clustering lesson](04b_rnaseq_clustering.html).
-
 
 ----
 
@@ -232,6 +213,24 @@ be distinguishable if we explore other PC axis!).
 * the genotype does not drive major changes in the transcriptome (but, again, 
 it doesn't mean that no genes differ between the genotypes, just that they don't 
 explain most of the variance captured by PC1 and PC2)
+
+
+#### Important note
+
+Often it is a good idea to _standardize_ the variables before doing the PCA. 
+This is often done by _centering_ the data on the mean and then _scaling_ it by 
+dividing by the standard deviation. This ensures that the PCA is not too influenced 
+by genes with higher absolute expression. By default, the `prcomp()` function 
+does the centering but not the scaling. See the `?prcomp` help to see how to change 
+this default behaviour. In this case, because we are using the 
+transformed data, this is not too much of an issue, but try re-running the PCA 
+with the _centered_ and _scaled_ data to see how it changes it. 
+
+Note that _scaling_ is particularly recommended if your variables are on different 
+scales.
+
+We talk more about standardizing gene expression data in the 
+[gene clustering lesson](04b_rnaseq_clustering.html).
 
 
 ### Variance explained by PCs
