@@ -30,8 +30,10 @@ Nature Methods 14, 641–642
 * StatQuest videos by Josh Starmer (watch all of them!): 
     * [Principal Component Analysis (PCA), Step-by-Step](https://youtu.be/FgakZw6K1QQ)
     * [PCA - Practical Tips](https://youtu.be/oRvgq966yZg)
-* Book chapter from Holmes & Huber _Modern Statistics for Modern Biology_:
+* Book chapters from Holmes & Huber _Modern Statistics for Modern Biology_:
     * [Multivariate Analysis](https://www.huber.embl.de/msmb/Chap-Multivariate.html)
+    * [Multivariate methods for heterogeneous data](https://www.huber.embl.de/msmb/Chap-MultivaHetero.html)
+    (gives alternatives methods to PCA)
 
 
 # Setup
@@ -156,6 +158,62 @@ Now you know how to convert a `matrix` to a `data.frame`, which can be a very ha
 trick to have!
 
 
+#### Important note
+
+Often it is a good idea to _standardize_ the variables before doing the PCA. 
+This is often done by _centering_ the data on the mean and then _scaling_ it by 
+dividing by the standard deviation. This ensures that the PCA is not too influenced 
+by genes with higher absolute expression. By default, the `prcomp()` function 
+does the centering but not the scaling. See the `?prcomp` help to see how to change 
+this default behaviour. In this case, because we are using the 
+transformed data, this is not too much of an issue, but try re-running the PCA 
+with the _centered_ and _scaled_ data to see how it changes it. 
+
+Note that _scaling_ is particularly recommended if your variables are on different 
+scales.
+
+We talk more about standardizing gene expression data in the 
+[gene clustering lesson](04b_rnaseq_clustering.html).
+
+
+
+### Variance explained by PCs
+
+Thr first important question to ask after we do a PCA is how many PCs we have and 
+how much variance they explain.
+
+We need to extract the variance explained by each PC from our `sample_pca` object.
+We could do this "manually", using `sample_pca$sdev^2`, but instead we will use a 
+function from the [`broom` package](https://cran.r-project.org/web/packages/broom/vignettes/broom.html)
+which conveniently formats the data for plotting:
+
+```{r}
+library(broom)
+
+# PC variances (eigen values)
+tidy(sample_pca, matrix = "pcs")
+```
+
+This table can easily be used to produce a _Scree Plot_, which shows the fraction 
+of total variance explained by each principal component. We will show both the 
+variance explained by individual PCs as well as the cumulative variance, using a 
+type of visualisation known as a [pareto chart](https://en.wikipedia.org/wiki/Pareto_chart):
+
+```{r}
+tidy(sample_pca, matrix = "pcs") %>% 
+  ggplot(aes(x = factor(PC))) +
+  geom_col(aes(y = percent)) +
+  geom_line(aes(y = cumulative, group = 1)) + 
+  geom_point(aes(y = cumulative)) +
+  labs(x = "Principal component", y = "Fraction variance explained")
+```
+
+You can see how successive PCs explain less and less of the total variance in the 
+original data. Also note that `r length(sample_pca$sdev)` components are enough to 
+virtually explain _all_ of the variance in our dataset. This makes sense in this 
+case since we only have 36 biological samples.
+
+
 ### Visualising samples on PC space
 
 `prcomp()` returns an oject of its own class. To access individual elements from 
@@ -213,62 +271,6 @@ be distinguishable if we explore other PC axis!).
 * the genotype does not drive major changes in the transcriptome (but, again, 
 it doesn't mean that no genes differ between the genotypes, just that they don't 
 explain most of the variance captured by PC1 and PC2)
-
-
-#### Important note
-
-Often it is a good idea to _standardize_ the variables before doing the PCA. 
-This is often done by _centering_ the data on the mean and then _scaling_ it by 
-dividing by the standard deviation. This ensures that the PCA is not too influenced 
-by genes with higher absolute expression. By default, the `prcomp()` function 
-does the centering but not the scaling. See the `?prcomp` help to see how to change 
-this default behaviour. In this case, because we are using the 
-transformed data, this is not too much of an issue, but try re-running the PCA 
-with the _centered_ and _scaled_ data to see how it changes it. 
-
-Note that _scaling_ is particularly recommended if your variables are on different 
-scales.
-
-We talk more about standardizing gene expression data in the 
-[gene clustering lesson](04b_rnaseq_clustering.html).
-
-
-### Variance explained by PCs
-
-Another important question to ask after we do a PCA is how many PCs we have and 
-how much variance they explain.
-
-We need to extract the variance explained by each PC from our `sample_pca` object.
-We could do this "manually", using `sample_pca$sdev^2`, but instead we will use a 
-function from the [`broom` package](https://cran.r-project.org/web/packages/broom/vignettes/broom.html)
-which conveniently formats the data for plotting:
-
-```{r}
-library(broom)
-
-# PC variances (eigen values)
-tidy(sample_pca, matrix = "pcs")
-```
-
-This table can easily be used to produce a _Scree Plot_, which shows the fraction 
-of total variance explained by each principal component. We will show both the 
-variance explained by individual PCs as well as the cumulative variance, using a 
-type of visualisation known as a [pareto chart](https://en.wikipedia.org/wiki/Pareto_chart):
-
-```{r}
-tidy(sample_pca, matrix = "pcs") %>% 
-  ggplot(aes(x = factor(PC))) +
-  geom_col(aes(y = percent)) +
-  geom_line(aes(y = cumulative, group = 1)) + 
-  geom_point(aes(y = cumulative)) +
-  labs(x = "Principal component", y = "Fraction variance explained")
-```
-
-You can see how successive PCs explain less and less of the total variance in the 
-original data. Also note that `r length(sample_pca$sdev)` components are enough to 
-virtually explain _all_ of the variance in our dataset. This makes sense in this 
-case since we only have 36 biological samples.
-
 
 
 ### Exploring correlation between genes and PCs
