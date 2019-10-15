@@ -75,7 +75,7 @@ test_result %>%
   geom_point(alpha = 0.1) +
   geom_point(aes(y = sig), colour = "brown", size = 1) +
   scale_x_continuous(trans = "log10") +
-  facet_wrap( ~ comparison)
+  facet_wrap(vars(comparison))
 ```
 
 ----
@@ -119,7 +119,7 @@ For convenience we also make a long version of our table (covered in the
 ```{r}
 trans_cts_long <- trans_cts %>% 
   # convert to long format
-  gather("sample", "cts", wt_0_r1:mut_180_r3)  %>% 
+  pivot_longer(cols = wt_0_r1:mut_180_r3, names_to = "sample", values_to = "cts")  %>% 
   # join with sample info table
   full_join(sample_info, by = ("sample"))
 ```
@@ -149,7 +149,7 @@ We can plot each gene's expression across time (although the result is very conf
 trans_cts_mean %>% 
   ggplot(aes(minute, mean_cts)) +
   geom_line(aes(group = gene), alpha = 0.3) +
-  facet_grid(strain ~ .)
+  facet_grid(rows = vars(strain))
 ```
 
 
@@ -200,7 +200,7 @@ trans_cts_mean %>%
   ggplot(aes(minute, mean_cts_scaled)) +
   geom_line(aes(group = gene), alpha = 0.2) + 
   geom_hline(yintercept = 0, colour = "brown", linetype = "dashed") +
-  facet_grid(strain ~ .)
+  facet_grid(rows = vars(strain))
 ```
 
 As you see, this is a substantially clearer picture than before, we can clearly 

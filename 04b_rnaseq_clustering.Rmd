@@ -59,7 +59,7 @@ candidate_genes <- test_result %>%
 # Summarise counts 
 trans_cts_mean <- trans_cts %>% 
   # convert to long format
-  gather("sample", "cts", wt_0_r1:mut_180_r3)  %>% 
+  pivot_longer(cols = wt_0_r1:mut_180_r3, names_to = "sample", values_to = "cts")  %>% 
   # join with sample info table
   full_join(sample_info, by = ("sample")) %>% 
   # filter to retain only genes of interest
@@ -230,7 +230,7 @@ And now we can make a plot, facetting according to `strain` and `cluster`:
 trans_cts_cluster %>% 
   ggplot(aes(minute, mean_cts_scaled)) +
   geom_line(aes(group = gene)) +
-  facet_grid(strain ~ cluster)
+  facet_grid(rows = vars(strain), cols = vars(cluster))
 ```
 
 This is a much nicer picture, as we can now see how different clusters represent 
@@ -254,7 +254,7 @@ trans_cts_cluster %>%
   geom_line(aes(group = gene), alpha = 0.3) +
   geom_line(stat = "summary", fun.y = "median", colour = "brown", size = 1.5, 
             aes(group = 1)) +
-  facet_grid(strain ~ cluster)
+  facet_grid(rows = vars(strain), cols = vars(cluster))
 ```
 
 
