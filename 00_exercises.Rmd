@@ -87,7 +87,7 @@ raw_cts_long %>%
   # make sure minute is specified as a factor
   ggplot(aes(factor(minute), log10(cts + 1), colour = strain)) + 
   geom_boxplot() + 
-  facet_grid(. ~ replicate)
+  facet_grid(cols = vars(replicate))
 ```
 
 
@@ -182,7 +182,7 @@ pc_scores %>%
 test_result %>% 
   ggplot(aes(log10(baseMean), log2FoldChange)) +
   geom_point(alpha = 0.1) +
-  facet_wrap( ~ comparison)
+  facet_wrap(vars(comparison))
 
 # 2. The reason fold change is log-transformed is:
 # Because a fold-change (FC) is a ratio between two things FC = a/b
@@ -210,7 +210,7 @@ test_result %>%
   geom_point(alpha = 0.1) +
   geom_point(aes(y = sig), colour = "brown", size = 1) +
   scale_x_continuous(trans = "log10") +
-  facet_wrap( ~ comparison)
+  facet_wrap(vars(comparison))
 ```
 
 
