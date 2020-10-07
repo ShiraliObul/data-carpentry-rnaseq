@@ -191,7 +191,7 @@ which conveniently formats the data for plotting:
 library(broom)
 
 # PC variances (eigen values)
-tidy(sample_pca, matrix = "pcs")
+tidy(sample_pca, matrix = "eigenvalues")
 ```
 
 This table can easily be used to produce a _Scree Plot_, which shows the fraction 
@@ -200,7 +200,7 @@ variance explained by individual PCs as well as the cumulative variance, using a
 type of visualisation known as a [pareto chart](https://en.wikipedia.org/wiki/Pareto_chart):
 
 ```{r}
-tidy(sample_pca, matrix = "pcs") %>% 
+tidy(sample_pca, matrix = "eigenvalues") %>% 
   ggplot(aes(x = factor(PC))) +
   geom_col(aes(y = percent)) +
   geom_line(aes(y = cumulative, group = 1)) + 
@@ -293,7 +293,7 @@ format:
 
 ```{r}
 # variable loadings (eigen vectors) for genes that were used as variables in PCA
-tidy(sample_pca, matrix = "variables")
+tidy(sample_pca, matrix = "loadings")
 ```
 
 From these data, we can extract the genes with the highest eigenvalues along PC1 
@@ -302,7 +302,7 @@ and PC2 using some `dplyr` tricks.
 ```{r}
 top_genes <- sample_pca %>% 
   # extract variable (gene) loadings
-  tidy(matrix = "variables") %>%  
+  tidy(matrix = "loadings") %>%  
   # retain only PC1 and PC2
   filter(PC %in% c(1, 2)) %>%
   # for each PC
@@ -342,26 +342,25 @@ loadings_plot <- ggplot(gene_loadings) +
 loadings_plot
 ```
 
-Using the [`cowplot`](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html) 
+Using the [`patchwork`](https://patchwork.data-imaginist.com/) 
 package, we put these two plots side by side to get a 
 more complete and interpretable view of our PCA analysis:
 
 ```{r, fig.width=8, fig.height=3}
-# note that cowplot changes the default ggplot2 theme to a cleaner look
-library(cowplot)
+library(patchwork)
 
 # Adjust some aspects of each plot
 pca_plot <- pca_plot + 
   coord_fixed(ratio = 0.4) + 
-  labs(tag = "A", title = "PC scores") + 
+  labs(title = "PC scores") +
   theme(legend.position = "none")
 
 loadings_plot <- loadings_plot + 
   coord_fixed(ratio = 0.4) + 
-  labs(tag = "B", title = "PC loadings")
+  labs(title = "PC loadings")
 
 # Put them together
-plot_grid(pca_plot, loadings_plot, ncol = 2, align = "h")
+(pca_plot | loadings_plot) + plot_annotation(tag_levels = "A")
 ```
 
 Notice how we've forced our PC1 axis to be around twice as long as the PC2 
