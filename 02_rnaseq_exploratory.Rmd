@@ -241,7 +241,8 @@ Now, we can use the `rplot()` function to help us visualise this:
 ```{r, message=FALSE}
 library(corrr)
 
-rplot(trans_cts_corr) 
+rplot(trans_cts_corr) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 
