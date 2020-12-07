@@ -130,7 +130,7 @@ However, we do not want to use all of the genes in that matrix, but rather the
 subset of genes that we think are differentially expressed between time points. 
 To subset a matrix, we need to use the "square bracket" notation `[rows , columns]`. 
 Because the rows on our matrix are named, we can use our vector of gene names 
-created above (`candidate_genes`) to do this:
+created [earlier](04a_explore_test_results.html#visualising_expression_trends) (`candidate_genes`) to do this:
 
 ```{r}
 hclust_matrix <- hclust_matrix[candidate_genes, ]
@@ -252,7 +252,7 @@ the median expression in each cluster:
 trans_cts_cluster %>% 
   ggplot(aes(minute, mean_cts_scaled)) +
   geom_line(aes(group = gene), alpha = 0.3) +
-  geom_line(stat = "summary", fun.y = "median", colour = "brown", size = 1.5, 
+  geom_line(stat = "summary", fun = "median", colour = "brown", size = 1.5, 
             aes(group = 1)) +
   facet_grid(rows = vars(strain), cols = vars(cluster))
 ```
