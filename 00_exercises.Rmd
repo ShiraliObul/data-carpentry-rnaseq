@@ -109,7 +109,7 @@ trans_cts %>%
 
 ## Examine `prcomp()` output
 
-```{r}
+```{r, echo=FALSE}
 sample_pca <- prcomp(t(trans_cts[, -1]))
 ```
 
@@ -118,9 +118,12 @@ After running the PCA investigate:
 
 1. What type of object is it? (hint: `class()`)
 2. What is the _structure_ of this object?  (hint: `str()`)
-3. Can you identify which parts of the object contain the _PC scores_, _eigenvalues_ and _variable loadings_? 
-(hint: check `prcomp()`'s help)
-4. Can you extract individual elements from this object? (hint: use `$`)
+3. Look at the `prcomp()` help page to identify which parts of the object contain the _PC scores_, _eigenvalues_ and _variable loadings_? 
+(hint: look under the section "Value" of the help page). As a reminder:
+    * _PC scores_: new coordinates of the data on the PC axis
+    * _eigenvalues_: variance explained by each PC
+    * _variable loadings_: "weight" that each original gene has on each PC axis 
+4. Extract these three elements from the object? (hint: use `$`)
     * Save the output in objects called `pc_scores`, `pc_eigenvalues` and `pc_loadings`
     * what class is each of these elements?
 5. How many principal components do you have?
@@ -152,22 +155,80 @@ ncol(pc_loadings)
 
 ## Annotating PC plot
 
-Try to recreate the plot below. 
-You will first need to _join_ your `pc_scores` table with the `sample_info` table.
-Then, _colour_ the points according to "minute" and their _shape_ according to "strain".
+Fix the following code (where the word <span style="color: tomato;">FIXME</span> 
+appears), to recreate the plot below.
+Once the code is fixed, assign (`<-`) the result to an object called `pca_plot`.
+
+What can you conclude from this result?
+
+<pre><code># get the PC scores from prcomp object
+sample_pca$x %>% 
+  # convert it to a tibble
+  as_tibble(rownames = "sample") %>% 
+  # join with "sample_info" table
+  <span style="color: tomato;">FIXME</span>(sample_info, by = "<span style="color: tomato;">FIXME</span>") %>% 
+  # make the plot
+  ggplot(aes(x = PC1, y = PC2, 
+             <span style="color: tomato;">FIXME</span> = factor(minute), shape = <span style="color: tomato;">FIXME</span>)) +
+  geom_point()
+</code></pre>
 
 ```{r}
-pc_scores %>% 
-  # convert it to a tibble retaining the sample names as a new column
+pca_plot <- sample_pca$x %>% # extract the loadings from prcomp
+  # convert to a tibble retaining the sample names as a new column
   as_tibble(rownames = "sample") %>% 
   # join with "sample_info" table 
   full_join(sample_info, by = "sample") %>% 
   # create the plot
   ggplot(aes(x = PC1, y = PC2, colour = factor(minute), shape = strain)) +
   geom_point()
+
+# print the result (in this case a ggplot)
+pca_plot
 ```
 
 
+## Visualise variable loadings
+
+```{r, echo=FALSE}
+top_genes <- sample_pca$rotation %>% 
+  as_tibble(rownames = "gene") %>% 
+  select(gene, PC1, PC2) %>%
+  pivot_longer(matches("PC"), names_to = "PC", values_to = "loading") %>% 
+  group_by(PC) %>% 
+  arrange(desc(abs(loading))) %>% 
+  slice(1:10) %>% 
+  pull(gene) %>% unique()
+top_loadings <- sample_pca$rotation %>% 
+  as_tibble(rownames = "gene") %>% 
+  filter(gene %in% top_genes)
+```
+
+
+Fix the following code (where the word <span style="color: tomato;">FIXME</span> 
+appears), to recreate the plot below.
+Once the code is fixed, assign (`<-`) the result to an object called `loadings_plot`.
+
+<pre><code>ggplot(data = top_loadings) +
+  geom_segment(aes(x = 0, y = 0, xend = PC1, yend = <span style="color: tomato;">FIXME</span>), 
+               arrow = arrow(length = unit(0.1, "in")),
+               <span style="color: tomato;">FIXME</span> = "brown") +
+  geom_text(aes(x = <span style="color: tomato;">FIXME</span>, y = PC2, label = gene),
+            nudge_y = 0.005, size = 3) +
+  scale_x_continuous(expand = c(0.02, 0.02))
+</code></pre>
+
+
+```{r}
+loadings_plot <- ggplot(data = top_loadings) +
+  geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2), 
+               arrow = arrow(length = unit(0.1, "in")),
+               colour = "brown") +
+  geom_text(aes(x = PC1, y = PC2, label = gene),
+            nudge_y = 0.005, size = 3) +
+  scale_x_continuous(expand = c(0.02, 0.02))
+loadings_plot
+```
 
 # Exploring test results
 
