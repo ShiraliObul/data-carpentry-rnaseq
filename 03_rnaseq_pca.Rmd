@@ -113,7 +113,7 @@ sample_pca <- prcomp(pca_matrix)
 
 > Examine the output of the `prcomp()` function.
 
-[Link to full exercise](00_exercises.html#31_examine_prcomp()_output)
+[Link to full exercise](00_exercises.html#31_Examine_prcomp()_output)
 
 ----
 
@@ -276,7 +276,7 @@ data, suggesting clusters of samples that are more similar to each other.
 
 > Recreate the plot below. Save the plot in an object called `pca_plot`
 
-[Link to full exercise](00_exercises.html#32_annotating_pc_plot)
+[Link to full exercise](00_exercises.html#32_Annotating_PC_plot)
 
 ```{r, echo=FALSE}
 # The PC scores are stored in the "x" value of the prcomp object, which is a matrix
@@ -369,7 +369,7 @@ top_loadings <- pc_loadings %>%
 
 > Recreate the plot below. Save the plot in an object called `loadings_plot`
 
-[Link to full exercise](00_exercises.html#33_visualise_variable_loadings)
+[Link to full exercise](00_exercises.html#33_Visualise_variable_loadings)
 
 ```{r, echo=FALSE}
 loadings_plot <- ggplot(top_loadings) +
