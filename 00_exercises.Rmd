@@ -64,8 +64,9 @@ raw_cts_long <- raw_cts %>%
 
 ## Join tables
 
-* Produce a similar plot for the raw count data. (hint: you might want to try 
-log-transforming the data).
+* Take the `raw_cts_long` object created in the previous exercise and _join_ it with the `sample_info` table. 
+* Produce the plot below for the raw count data. (hint: you might want to try 
+log-transforming the x-axis data using the `log10()` function).
 
 ```{r, results=FALSE}
 # Join with sample information table
@@ -75,7 +76,8 @@ raw_cts_long <- full_join(raw_cts_long, sample_info, by = ("sample"))
 raw_cts_long %>%
   # add pseudo-count of 1 because log(0) = -Inf
   ggplot(aes(log10(cts + 1), colour = replicate)) + 
-  geom_freqpoly(binwidth = 1)
+  geom_freqpoly(binwidth = 1) +
+  facet_grid(rows = vars(strain), cols = vars(minute))
 ```
 
 
@@ -85,7 +87,7 @@ raw_cts_long %>%
 # Make a boxplot
 raw_cts_long %>%
   # make sure minute is specified as a factor
-  ggplot(aes(factor(minute), log10(cts + 1), colour = strain)) + 
+  ggplot(aes(factor(minute), log10(cts + 1), fill = strain)) + 
   geom_boxplot() + 
   facet_grid(cols = vars(replicate))
 ```

@@ -64,7 +64,7 @@ trans_cts %>%
   left_join(sample_info, by = "sample") %>% 
   ggplot(aes(cts, colour = replicate)) + 
   geom_freqpoly(binwidth = 1) + 
-  facet_grid(strain ~ minute)
+  facet_grid(rows = vars(strain), cols = vars(minute))
 ```
 
 
