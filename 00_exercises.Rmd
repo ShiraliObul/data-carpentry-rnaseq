@@ -20,9 +20,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, echo = FALSE, message = FALSE}
 # Load the tidyverse package
 library(tidyverse)
-
-# Load the data
-load("data/fission_data.RData")
 ```
 
 # Intro
@@ -113,22 +110,23 @@ trans_cts %>%
 
 ```{r, echo=FALSE}
 sample_pca <- prcomp(t(trans_cts[, -1]))
+pc_scores <- sample_pca$x
 ```
 
 
 After running the PCA investigate:
 
 1. What type of object is it? (hint: `class()`)
-2. What is the _structure_ of this object?  (hint: `str()`)
-3. Look at the `prcomp()` help page to identify which parts of the object contain the _PC scores_, _eigenvalues_ and _variable loadings_? 
+2. The object returned by this function is a list-type object. We haven't encountered these before. Use the `str()` function to examine what is inside the object (i.e. its _structure_).
+3. Look at the `prcomp()` help page to identify which parts of the object contain the _eigenvalues_, the _variable loadings_ and the _PC scores_
 (hint: look under the section "Value" of the help page). As a reminder:
     * _PC scores_: new coordinates of the data on the PC axis
     * _eigenvalues_: variance explained by each PC
     * _variable loadings_: "weight" that each original gene has on each PC axis 
-4. Extract these three elements from the object? (hint: use `$`)
-    * Save the output in objects called `pc_scores`, `pc_eigenvalues` and `pc_loadings`
+4. To access elements of this list-type object we can use the `$`. For example, the _PC scores_ can be obtained with: `pc_scores <- sample_pca$x`.
+Similarly to this, extract the _eigenvalues_ and _variable loadings_ to objects called  `pc_eigenvalues` and `pc_loadings`.
     * what class is each of these elements?
-5. How many principal components do you have?
+5. How many principal components do we have?
 
 ```{r, results=FALSE}
 # 1. class of the object

@@ -1792,19 +1792,18 @@ div.tocify {
 <p>After running the PCA investigate:</p>
 <ol style="list-style-type: decimal">
 <li>What type of object is it? (hint: <code>class()</code>)</li>
-<li>What is the <em>structure</em> of this object? (hint: <code>str()</code>)</li>
-<li>Look at the <code>prcomp()</code> help page to identify which parts of the object contain the <em>PC scores</em>, <em>eigenvalues</em> and <em>variable loadings</em>? (hint: look under the section “Value” of the help page). As a reminder:
+<li>The object returned by this function is a list-type object. We haven’t encountered these before. Use the <code>str()</code> function to examine what is inside the object (i.e. its <em>structure</em>).</li>
+<li>Look at the <code>prcomp()</code> help page to identify which parts of the object contain the <em>eigenvalues</em>, the <em>variable loadings</em> and the <em>PC scores</em> (hint: look under the section “Value” of the help page). As a reminder:
 <ul>
 <li><em>PC scores</em>: new coordinates of the data on the PC axis</li>
 <li><em>eigenvalues</em>: variance explained by each PC</li>
 <li><em>variable loadings</em>: “weight” that each original gene has on each PC axis</li>
 </ul></li>
-<li>Extract these three elements from the object? (hint: use <code>$</code>)
+<li>To access elements of this list-type object we can use the <code>$</code>. For example, the <em>PC scores</em> can be obtained with: <code>pc_scores &lt;- sample_pca$x</code>. Similarly to this, extract the <em>eigenvalues</em> and <em>variable loadings</em> to objects called <code>pc_eigenvalues</code> and <code>pc_loadings</code>.
 <ul>
-<li>Save the output in objects called <code>pc_scores</code>, <code>pc_eigenvalues</code> and <code>pc_loadings</code></li>
 <li>what class is each of these elements?</li>
 </ul></li>
-<li>How many principal components do you have?</li>
+<li>How many principal components do we have?</li>
 </ol>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># 1. class of the object</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="kw">class</span>(sample_pca)</span>
